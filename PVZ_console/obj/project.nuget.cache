@@ -1,8 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "2T/kS/SsOKg=",
+  "dgSpecHash": "uoBjw7hFaXY=",
   "success": true,
-  "projectFilePath": "C:\\Users\\2477548\\Documents\\GitHub\\PvZ_c-sharp\\PVZ_console\\PVZ_console.csproj",
-  "expectedPackageFiles": [],
+  "projectFilePath": "C:\\Users\\rajaa\\Documents\\Git\\PvZ_c-sharp\\PVZ_console\\PVZ_console.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\rajaa\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\6.0.33\\microsoft.windowsdesktop.app.ref.6.0.33.nupkg.sha512",
+    "C:\\Users\\rajaa\\.nuget\\packages\\microsoft.netcore.app.ref\\6.0.33\\microsoft.netcore.app.ref.6.0.33.nupkg.sha512",
+    "C:\\Users\\rajaa\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\6.0.33\\microsoft.aspnetcore.app.ref.6.0.33.nupkg.sha512",
+    "C:\\Users\\rajaa\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\6.0.33\\microsoft.netcore.app.host.win-x64.6.0.33.nupkg.sha512"
+  ],
   "logs": []
 }

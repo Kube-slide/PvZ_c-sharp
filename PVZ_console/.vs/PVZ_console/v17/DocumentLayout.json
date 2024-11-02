@@ -1,13 +1,13 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\2477548\\Documents\\GitHub\\PvZ_c-sharp\\PVZ_console\\",
+  "WorkspaceRootPath": "C:\\Users\\rajaa\\Documents\\Git\\PvZ_c-sharp\\PVZ_console\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{F332A005-4E05-458E-9F07-8665D7AAA9DC}|PVZ_console.csproj|c:\\users\\2477548\\documents\\github\\pvz_c-sharp\\pvz_console\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{F332A005-4E05-458E-9F07-8665D7AAA9DC}|PVZ_console.csproj|c:\\users\\rajaa\\documents\\git\\pvz_c-sharp\\pvz_console\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{F332A005-4E05-458E-9F07-8665D7AAA9DC}|PVZ_console.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{F332A005-4E05-458E-9F07-8665D7AAA9DC}|PVZ_console.csproj|c:\\users\\2477548\\documents\\github\\pvz_c-sharp\\pvz_console\\pvz_console.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "AbsoluteMoniker": "D:0:0:{F332A005-4E05-458E-9F07-8665D7AAA9DC}|PVZ_console.csproj|c:\\users\\rajaa\\documents\\git\\pvz_c-sharp\\pvz_console\\pvz_console.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
       "RelativeMoniker": "D:0:0:{F332A005-4E05-458E-9F07-8665D7AAA9DC}|PVZ_console.csproj|solutionrelative:pvz_console.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
     }
   ],
@@ -24,11 +24,11 @@
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Users\\2477548\\Documents\\GitHub\\PvZ_c-sharp\\PVZ_console\\Program.cs",
+              "DocumentMoniker": "C:\\Users\\rajaa\\Documents\\Git\\PvZ_c-sharp\\PVZ_console\\Program.cs",
               "RelativeDocumentMoniker": "Program.cs",
-              "ToolTip": "C:\\Users\\2477548\\Documents\\GitHub\\PvZ_c-sharp\\PVZ_console\\Program.cs",
+              "ToolTip": "C:\\Users\\rajaa\\Documents\\Git\\PvZ_c-sharp\\PVZ_console\\Program.cs",
               "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAAHsAAAAAAAAAAAAIwN8AAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAD8AAAAAAAAAAAAowKcAAAA6AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-11-01T13:09:09.087Z",
               "EditorCaption": ""
@@ -36,15 +36,14 @@
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "PVZ_console",
-              "DocumentMoniker": "C:\\Users\\2477548\\Documents\\GitHub\\PvZ_c-sharp\\PVZ_console\\PVZ_console.csproj",
+              "Title": "PVZ_console.csproj",
+              "DocumentMoniker": "C:\\Users\\rajaa\\Documents\\Git\\PvZ_c-sharp\\PVZ_console\\PVZ_console.csproj",
               "RelativeDocumentMoniker": "PVZ_console.csproj",
-              "ToolTip": "C:\\Users\\2477548\\Documents\\GitHub\\PvZ_c-sharp\\PVZ_console\\PVZ_console.csproj",
+              "ToolTip": "C:\\Users\\rajaa\\Documents\\Git\\PvZ_c-sharp\\PVZ_console\\PVZ_console.csproj",
               "RelativeToolTip": "PVZ_console.csproj",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2024-11-01T13:09:07.263Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-11-01T13:09:07.263Z"
             }
           ]
         }

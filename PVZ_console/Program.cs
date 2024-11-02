@@ -6,12 +6,13 @@ namespace PVZ_console
     internal class Program
     {
         //global
-        static string notesFilePath = @"C:\Users\2477548\source\repos\PVZ_console\Plants_Info.txt";
+        static string notesFilePath = @"..\..\..\Entities.txt";
         static List<PlantBrain> plants = new List<PlantBrain>();
         static List<ZombieBrain> zombies = new List<ZombieBrain>();
         static bool preload = false;
         static string[] gameStates = { "Menu", "In-game", "Paused"};
-        static string curState;
+        static string curState = gameStates[0];
+        static bool gameModeDetect = false;
 
         // We need to use unmanaged code
         [DllImport("user32.dll")]
@@ -42,7 +43,6 @@ namespace PVZ_console
         //Run every function every frame
         static void Main(string[] args)
         {
-            curState = gameStates[0];
             //Check if data has yet to be preloaded --> wont reload everything every frame the game is 
             if (!preload)
             {
@@ -113,7 +113,7 @@ namespace PVZ_console
                     DMM();
                     break;
                 case "In-game":
-                    Console.WriteLine("In-game");
+                    DIG();
                     break;
                 case "Paused":
                     Console.WriteLine("Game paused");
@@ -128,6 +128,45 @@ namespace PVZ_console
         {
             Console.WriteLine("Main menu");
             Console.WriteLine("1.Options\n2.Play game\n3.Exit\n4.Credits");
+        }
+
+        //Draw in-game
+        static void DIG()
+        {
+            //Rudementary cell implementationn
+            string cellTop = "╔═╗";
+            string cellMid = "║ ║";
+            string cellBot = "╚═╝";
+            //string cell = $"╔═╗\n║A║\n╚═╝";
+
+            //Think I inverted these :P
+            int numOfRows = 10;
+            int numOfColumns = 5;
+
+            //Really gross and probably inefficient implementation of cell spawning --> will modify eventually to add more granular control and variables
+            for(int i = 0; i<numOfColumns; i++)
+            {
+                for(int j = 0; j < numOfRows; j++)
+                {
+                    Console.Write($"{cellTop} ");
+                }
+                Console.Write("\n");
+                for (int j = 0; j < numOfRows; j++)
+                {
+                    Console.Write($"{cellMid} ");
+                }
+                Console.Write("\n");
+                for (int j = 0; j < numOfRows; j++)
+                {
+                    Console.Write($"{cellBot} ");
+                }
+                Console.Write("\n");
+            }
+
+            //Future ref for cell implementation is below
+            /*
+             * uhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh
+             */
         }
 
         //Function to get mousePosition. Returns (int, int) --> relative mousePOS to console
@@ -186,6 +225,14 @@ namespace PVZ_console
                 Console.WriteLine("Outside game area! Return back to keep playing!");
             }
 
+            if(curState == gameStates[0] && !gameModeDetect)
+            {
+                if(Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.A && !gameModeDetect)
+                {
+                    gameModeDetect = true;
+                    curState = gameStates[1];
+                }
+            }
         }
 
     }
