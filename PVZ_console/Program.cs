@@ -1,6 +1,5 @@
 ﻿using System.Drawing;
 using System.Runtime.InteropServices;
-using System.Security.Permissions;
 namespace PVZ_console
 {
     internal class Program
@@ -9,10 +8,12 @@ namespace PVZ_console
         static string notesFilePath = @"..\..\..\Entities.txt";
         static List<PlantBrain> plants = new List<PlantBrain>();
         static List<ZombieBrain> zombies = new List<ZombieBrain>();
+        static List<Cell> cell_list = new List<Cell>();
         static bool preload = false;
-        static string[] gameStates = { "Menu", "In-game", "Paused"};
+        static string[] gameStates = { "Menu", "In-game", "Paused" };
         static string curState = gameStates[0];
         static bool gameModeDetect = false;
+        static bool generatedCells = false;
 
         // We need to use unmanaged code
         [DllImport("user32.dll")]
@@ -43,10 +44,12 @@ namespace PVZ_console
         //Run every function every frame
         static void Main(string[] args)
         {
-            //Check if data has yet to be preloaded --> wont reload everything every frame the game is 
+            ScreenSize();
+
+            //Check if data has yet to be preloaded --> wont reload everything every frame the game is run
             if (!preload)
             {
-                //Always create entity list on first run
+                //Always create entity list on execute
                 initEntities();
             }
             else
@@ -56,22 +59,39 @@ namespace PVZ_console
             //Sleep for 1/4 of a second --> 4 fps? doesnt flash eyes too bad
             Thread.Sleep(250);
 
-            //Clear console (failsafe) and loop :|
+            //Clear console (failsafe) and loop :D
             Console.Clear();
             Main(null);
-
         }
 
-        //Generate list of all entities
+        //Force screen size to display everything adequatly
+        static void ScreenSize()
+        {
+            int desiredH = 27;
+            int desiredW = 60;
+
+            bool FixedWindow = (Console.WindowHeight != desiredH) && (Console.WindowWidth != desiredW);
+            while (FixedWindow)
+            {
+                Console.WriteLine($"The desired screen size is {desiredW} by {desiredH}.");
+                Console.WriteLine($"Currently, the screen size is {Console.WindowWidth} by {Console.WindowHeight}");
+                Console.WriteLine("Make adjustments to the window, then press any key to check again");
+                Console.ReadKey(true);
+                Console.Clear();
+                FixedWindow = (Console.WindowHeight != desiredH) && (Console.WindowWidth != desiredW);
+            }
+        }
+
+        //Generate list of all entities ; This is usually only a ONE-TIME process, if everything goes well
         static void initEntities()
         {
             //Create list of all plants and zombies in game
 
 
             //Using StreamRead, open all entities file path
-            using(var sr = new StreamReader(notesFilePath))
+            using (var sr = new StreamReader(notesFilePath))
             {
-                while(sr.Peek() >= 0)
+                while (sr.Peek() >= 0)
                 {
                     //Check whether each line is for zombies or plants
                     var line = sr.ReadLine();
@@ -91,7 +111,7 @@ namespace PVZ_console
                 preload = true;
             }
             //For each plant, print to user the details
-            for(int i = 0; i < plants.Count; i++)
+            for (int i = 0; i < plants.Count; i++)
             {
                 Console.WriteLine($"\n{plants[i].Plant_Name} : {plants[i].Plant_Description}. " +
                     $"\n|||STATS|||" +
@@ -99,7 +119,7 @@ namespace PVZ_console
                     $"\nCost to plant : {plants[i].Sun_cost}\n");
             }
         }
-    
+
         //Draw game screen
         static void Draw()
         {
@@ -133,20 +153,35 @@ namespace PVZ_console
         //Draw in-game
         static void DIG()
         {
-            //Rudementary cell implementationn
+            //Cell design
             string cellTop = "╔═╗";
             string cellMid = "║ ║";
             string cellBot = "╚═╝";
-            //string cell = $"╔═╗\n║A║\n╚═╝";
 
-            //Think I inverted these :P
             int numOfRows = 10;
-            int numOfColumns = 5;
+            int numOfCols = 7;
 
-            //Really gross and probably inefficient implementation of cell spawning --> will modify eventually to add more granular control and variables
-            for(int i = 0; i<numOfColumns; i++)
+            //Cell_ID tags
+            char cellRow = 'A';
+            int cellCol = 1;
+
+            if (!generatedCells)
             {
-                for(int j = 0; j < numOfRows; j++)
+                InitCells(cellRow, cellCol);
+                generatedCells = true;
+            }
+
+            if (!generatedCells)
+            {
+                for (int i = 0; i < numOfCols * numOfRows; i++)
+                {
+                    cell_list.Add(new Cell(($"A{i}"), (5, 5), null));
+                }
+            }
+
+            for (int i = 0; i < numOfCols; i++)
+            {
+                for (int j = 0; j < numOfRows; j++)
                 {
                     Console.Write($"{cellTop} ");
                 }
@@ -162,11 +197,15 @@ namespace PVZ_console
                 }
                 Console.Write("\n");
             }
+        }
 
-            //Future ref for cell implementation is below
-            /*
-             * uhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh
-             */
+        //Draw the cells
+        static void InitCells(int Cols, int Rows)
+        {
+            for(int i = 0; i < Cols*Rows; i++)
+            {
+                cell_list.Add(new Cell(null, (0, 0), null));
+            }
         }
 
         //Function to get mousePosition. Returns (int, int) --> relative mousePOS to console
@@ -216,7 +255,7 @@ namespace PVZ_console
             bool isInWindow = WithinWindow();
 
             //Check for input WITHOUT blocking script. W/o console.KeyAvailable, the rest of the code would hang :\
-            if(Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.Spacebar && isInWindow)
+            if (Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.Spacebar && isInWindow)
             {
                 Console.WriteLine($"Interact with user at location {MousePos}");
             }
@@ -225,9 +264,9 @@ namespace PVZ_console
                 Console.WriteLine("Outside game area! Return back to keep playing!");
             }
 
-            if(curState == gameStates[0] && !gameModeDetect)
+            if (curState == gameStates[0] && !gameModeDetect)
             {
-                if(Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.A && !gameModeDetect)
+                if (Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.A && !gameModeDetect)
                 {
                     gameModeDetect = true;
                     curState = gameStates[1];
@@ -237,7 +276,7 @@ namespace PVZ_console
 
     }
 
-    //Creating a plant + executing plant logic
+    //Creating a plant + executing plant logic -- Unfinished, in fact some may say not even started lol
     internal class PlantBrain
     {
         public string Plant_Name;
@@ -255,7 +294,7 @@ namespace PVZ_console
 
     }
 
-    //Creating a zombie + executing plant logic
+    //Creating a zombie + executing plant logic -- Unfinished, in fact some may say not even started lol
     internal class ZombieBrain
     {
         public string Zombie_Name;
@@ -264,7 +303,25 @@ namespace PVZ_console
         public ZombieBrain(string name, string desc)
         {
             Zombie_Name = name;
-            Zombie_Description= desc;
+            Zombie_Description = desc;
+        }
+    }
+
+    internal class Cell
+    {
+        public string cell_ID;
+        public (int, int) corners;
+        List<object> cell_Contents;
+
+        //Id system variables
+        char cellRow = 'A';
+        int cellCol = 1;
+
+        public Cell(string cell_id, (int, int) cellCorners, List<object> cellContent)
+        {
+            cell_ID = cell_id;
+            corners = cellCorners;
+            cell_Contents = cellContent;
         }
     }
 }
