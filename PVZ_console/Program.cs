@@ -57,7 +57,7 @@ namespace PVZ_console
                 Draw();
             }
             //Sleep for 1/4 of a second --> 4 fps? doesnt flash eyes too bad
-            Thread.Sleep(250);
+            Thread.Sleep(10);
 
             //Clear console (failsafe) and loop :D
             Console.Clear();
@@ -264,12 +264,26 @@ namespace PVZ_console
             //Check for input WITHOUT blocking script. W/o console.KeyAvailable, the rest of the code would hang :\
             if (Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.Spacebar && isInWindow)
             {
-                foreach(Cell cells in cell_list)
+                //for (int i = 0; i < cell_list.Count; i++)
+                //{
+                //    //Create window length detection --> translate num of characters to mousePOS
+                //    //For each cell check if mouse is in range
+                //    //If it is (for now) print what cell it is interacting with using cell_ID
+
+                //    (double, double) windowAsChar = CharToWindow();
+                //    if (IsInCell(windowAsChar, cell_list[i], MousePos))
+                //    {
+                //        Console.WriteLine(cell_list[i].cell_ID);
+                //    }
+                //}
+
+                for(int i = 0; i < cell_list.Count; i++)
                 {
-                    //Create window length detection --> translate num of characters to mousePOS
-                    //For each cell check if mouse is in range
-                    //If it is (for now) print what cell it is interacting with using cell_ID
-                    int windowAsChar = CharToWindow();
+                    (double, double) windowAsChar = CharToWindow();
+                    if (IsInCell(windowAsChar, cell_list[i], MousePos))
+                    {
+                        cell_list[i].cell_Contents.Add("s");
+                    }
                 }
             }
             else if (!isInWindow)
@@ -287,11 +301,38 @@ namespace PVZ_console
             }
         }
 
-        static int CharToWindow()
+        static (double, double) CharToWindow()
         {
-            return 0;
+            //Get our consoleWindow position for reference
+            IntPtr consoleHandle = GetForegroundWindow();
+
+            //Get our window size with coords
+            GetWindowRect(consoleHandle, out RECT consoleRect);
+
+            double hori = consoleRect.Right - consoleRect.Left;
+            double vert = consoleRect.Top - consoleRect.Bottom;
+
+            double convertedLengthHori = hori / Console.WindowWidth;
+            double convertedLengthVert = vert / Console.WindowHeight;
+
+            return (convertedLengthHori, convertedLengthVert);
         }
 
+        static bool IsInCell((double, double) conv, Cell cellToCheck, (int, int) mousePOS)
+        {
+
+            bool xAxis = mousePOS.Item1 >= (cellToCheck.cornerL.Item1 * conv.Item1) || mousePOS.Item1 <= (cellToCheck.cornerR.Item1 * conv.Item1);
+            bool yAxis = mousePOS.Item2 <= (cellToCheck.cornerL.Item2 * conv.Item2) || mousePOS.Item2 >= (cellToCheck.cornerR.Item2 * conv.Item2);
+
+            if (xAxis && yAxis)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 
     //Creating a plant + executing plant logic -- Unfinished, in fact some may say not even started lol
@@ -336,12 +377,12 @@ namespace PVZ_console
         char cellRow = 'A';
         int cellCol = 1;
 
-        public Cell(string cell_id, (int, int) cellTopLeft, (int, int) cellBotRight, List<object> cellContent)
+        public Cell(string cell_id, (int, int) cellTopLeft, (int, int) cellBotRight, List<object> objCells)
         {
             cell_ID = cell_id;
             cornerL = cellTopLeft;
             cornerR = cellBotRight;
-            cell_Contents = cellContent;
+            cell_Contents = objCells;
         }
     }
 
