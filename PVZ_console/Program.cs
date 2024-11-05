@@ -153,58 +153,65 @@ namespace PVZ_console
         //Draw in-game
         static void DIG()
         {
-            //Cell design
-            string cellTop = "╔═╗";
-            string cellMid = "║ ║";
-            string cellBot = "╚═╝";
-
+            //Vars in this section are STATIC --> aren't expected to change!
             int numOfRows = 10;
             int numOfCols = 7;
 
-            //Cell_ID tags
-            char cellRow = 'A';
-            int cellCol = 1;
-
             if (!generatedCells)
             {
-                InitCells(cellRow, cellCol);
+                InitCells(numOfCols, numOfRows);
                 generatedCells = true;
             }
 
-            if (!generatedCells)
-            {
-                for (int i = 0; i < numOfCols * numOfRows; i++)
-                {
-                    cell_list.Add(new Cell(($"A{i}"), (5, 5), null));
-                }
-            }
+            //Cell design --> needs to be under init cell so that you can store cell mid contents
+            string cellTop = "╔═╗";
+            string cellBot = "╚═╝";
 
             for (int i = 0; i < numOfCols; i++)
             {
                 for (int j = 0; j < numOfRows; j++)
                 {
-                    Console.Write($"{cellTop} ");
+                    Console.Write($"{cellTop}");
                 }
                 Console.Write("\n");
                 for (int j = 0; j < numOfRows; j++)
                 {
-                    Console.Write($"{cellMid} ");
+                    Console.Write($"║{cell_list[0].cell_Contents.Max()}║");
                 }
                 Console.Write("\n");
                 for (int j = 0; j < numOfRows; j++)
                 {
-                    Console.Write($"{cellBot} ");
+                    Console.Write($"{cellBot}");
                 }
                 Console.Write("\n");
             }
         }
 
-        //Draw the cells
+        //Create cell references ; ONLY DO THIS ONCE AT THE BEGINNING OF EVERY GAME RUN
         static void InitCells(int Cols, int Rows)
         {
-            for(int i = 0; i < Cols*Rows; i++)
+            //Create vars for cell top left and bottom right (somehow idk man)
+            (int, int) cellTopLeft = (1, 1);
+            (int, int) cellBotRight = (3, 3);
+
+            //Cell_ID tags
+            char cellRow = 'A';
+
+            for (int i = 0; i < Cols; i++)
             {
-                cell_list.Add(new Cell(null, (0, 0), null));
+                for (int j = 0; j < Rows; j++)
+                {
+                    List<object> cellContents = new List<object>();
+                    cellContents.Add(" ");
+                    cell_list.Add(new Cell($"{cellRow}{j+1}", cellTopLeft, cellBotRight, cellContents));
+                    cellTopLeft.Item1 += 4;
+                    cellBotRight.Item1 += 4;
+                }
+                cellRow++;
+                cellTopLeft.Item2 += 3;
+                cellBotRight.Item2 += 3;
+                cellTopLeft.Item1 = 1;
+                cellBotRight.Item1 = 1;
             }
         }
 
@@ -257,7 +264,12 @@ namespace PVZ_console
             //Check for input WITHOUT blocking script. W/o console.KeyAvailable, the rest of the code would hang :\
             if (Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.Spacebar && isInWindow)
             {
-                Console.WriteLine($"Interact with user at location {MousePos}");
+                foreach(Cell cells in cell_list)
+                {
+                    //Create window length detection --> translate num of characters to mousePOS
+                    //For each cell check if mouse is in range
+                    //If it is (for now) print what cell it is interacting with using cell_ID
+                }
             }
             else if (!isInWindow)
             {
@@ -310,18 +322,25 @@ namespace PVZ_console
     internal class Cell
     {
         public string cell_ID;
-        public (int, int) corners;
-        List<object> cell_Contents;
+        public (int, int) cornerL;
+        public (int, int) cornerR;
+        public List<object> cell_Contents;
 
         //Id system variables
         char cellRow = 'A';
         int cellCol = 1;
 
-        public Cell(string cell_id, (int, int) cellCorners, List<object> cellContent)
+        public Cell(string cell_id, (int, int) cellTopLeft, (int, int) cellBotRight, List<object> cellContent)
         {
             cell_ID = cell_id;
-            corners = cellCorners;
+            cornerL = cellTopLeft;
+            cornerR = cellBotRight;
             cell_Contents = cellContent;
         }
+    }
+
+    internal class Projectile
+    {
+
     }
 }
