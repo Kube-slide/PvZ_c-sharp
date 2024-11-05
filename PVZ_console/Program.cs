@@ -269,6 +269,7 @@ namespace PVZ_console
                     //Create window length detection --> translate num of characters to mousePOS
                     //For each cell check if mouse is in range
                     //If it is (for now) print what cell it is interacting with using cell_ID
+                    int windowAsChar = CharToWindow();
                 }
             }
             else if (!isInWindow)
@@ -284,6 +285,11 @@ namespace PVZ_console
                     curState = gameStates[1];
                 }
             }
+        }
+
+        static int CharToWindow()
+        {
+            return 0;
         }
 
     }
