@@ -57,7 +57,7 @@ namespace PVZ_console
                 Draw();
             }
             //Sleep for 1/4 of a second --> 4 fps? doesnt flash eyes too bad
-            Thread.Sleep(10);
+            Thread.Sleep(200);
 
             //Clear console (failsafe) and loop :D
             Console.Clear();
@@ -167,6 +167,8 @@ namespace PVZ_console
             string cellTop = "╔═╗";
             string cellBot = "╚═╝";
 
+            char cellRow = 'A';
+
             for (int i = 0; i < numOfCols; i++)
             {
                 for (int j = 0; j < numOfRows; j++)
@@ -176,13 +178,14 @@ namespace PVZ_console
                 Console.Write("\n");
                 for (int j = 0; j < numOfRows; j++)
                 {
-                    Console.Write($"║{cell_list[0].cell_Contents.Max()}║");
+                    Console.Write("║ ║");
                 }
                 Console.Write("\n");
                 for (int j = 0; j < numOfRows; j++)
                 {
                     Console.Write($"{cellBot}");
                 }
+                cellRow++;
                 Console.Write("\n");
             }
         }
@@ -193,6 +196,7 @@ namespace PVZ_console
             //Create vars for cell top left and bottom right (somehow idk man)
             (int, int) cellTopLeft = (1, 1);
             (int, int) cellBotRight = (3, 3);
+            List<object> cellObjs = new List<object>();
 
             //Cell_ID tags
             char cellRow = 'A';
@@ -201,9 +205,8 @@ namespace PVZ_console
             {
                 for (int j = 0; j < Rows; j++)
                 {
-                    List<object> cellContents = new List<object>();
-                    cellContents.Add(" ");
-                    cell_list.Add(new Cell($"{cellRow}{j+1}", cellTopLeft, cellBotRight, cellContents));
+                    cell_list.Add(new Cell($"{cellRow}{j+1}", cellTopLeft, cellBotRight, cellObjs));
+
                     cellTopLeft.Item1 += 4;
                     cellBotRight.Item1 += 4;
                 }
@@ -277,12 +280,12 @@ namespace PVZ_console
                 //    }
                 //}
 
-                for(int i = 0; i < cell_list.Count; i++)
+                for (int i = 0; i < cell_list.Count; i++)
                 {
                     (double, double) windowAsChar = CharToWindow();
                     if (IsInCell(windowAsChar, cell_list[i], MousePos))
                     {
-                        cell_list[i].cell_Contents.Add("s");
+                        cell_list[i].AddToList("KILL YOURSELF");
                     }
                 }
             }
@@ -383,6 +386,11 @@ namespace PVZ_console
             cornerL = cellTopLeft;
             cornerR = cellBotRight;
             cell_Contents = objCells;
+        }
+
+        public void AddToList(object itemToAdd)
+        {
+            cell_Contents.Add(itemToAdd);
         }
     }
 
