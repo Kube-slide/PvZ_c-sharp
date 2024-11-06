@@ -178,7 +178,8 @@ namespace PVZ_console
                 Console.Write("\n");
                 for (int j = 0; j < numOfRows; j++)
                 {
-                    Console.Write("║ ║");
+                    string curId = $"{cellRow}{j+1}";
+                    Console.Write($"║{cell_list.Find(Cell => Cell.cell_ID == curId).cell_Contents.Max()}║");
                 }
                 Console.Write("\n");
                 for (int j = 0; j < numOfRows; j++)
@@ -196,8 +197,6 @@ namespace PVZ_console
             //Create vars for cell top left and bottom right (somehow idk man)
             (int, int) cellTopLeft = (1, 1);
             (int, int) cellBotRight = (3, 3);
-            List<object> cellObjs = new List<object>();
-
             //Cell_ID tags
             char cellRow = 'A';
 
@@ -205,6 +204,9 @@ namespace PVZ_console
             {
                 for (int j = 0; j < Rows; j++)
                 {
+                    List<object> cellObjs = new List<object>();
+
+                    cellObjs.Add(" ");
                     cell_list.Add(new Cell($"{cellRow}{j+1}", cellTopLeft, cellBotRight, cellObjs));
 
                     cellTopLeft.Item1 += 4;
@@ -214,7 +216,7 @@ namespace PVZ_console
                 cellTopLeft.Item2 += 3;
                 cellBotRight.Item2 += 3;
                 cellTopLeft.Item1 = 1;
-                cellBotRight.Item1 = 1;
+                cellBotRight.Item1 = 3;
             }
         }
 
@@ -263,43 +265,40 @@ namespace PVZ_console
             //Start by getting mousePOS every 'frame'
             (int, int) MousePos = GetMouseInput();
             bool isInWindow = WithinWindow();
+            (double, double) convertedCharLength = CharToWindow();
 
             //Check for input WITHOUT blocking script. W/o console.KeyAvailable, the rest of the code would hang :\
-            if (Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.Spacebar && isInWindow)
+            // Loop this 10 times --> ensures proper input capture
+            for(int k = 0; k < 10; k++)
             {
-                //for (int i = 0; i < cell_list.Count; i++)
-                //{
-                //    //Create window length detection --> translate num of characters to mousePOS
-                //    //For each cell check if mouse is in range
-                //    //If it is (for now) print what cell it is interacting with using cell_ID
-
-                //    (double, double) windowAsChar = CharToWindow();
-                //    if (IsInCell(windowAsChar, cell_list[i], MousePos))
-                //    {
-                //        Console.WriteLine(cell_list[i].cell_ID);
-                //    }
-                //}
-
-                for (int i = 0; i < cell_list.Count; i++)
+                if(Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.Spacebar && isInWindow)
                 {
-                    (double, double) windowAsChar = CharToWindow();
-                    if (IsInCell(windowAsChar, cell_list[i], MousePos))
+                    for (int i = 0; i < cell_list.Count; i++)
                     {
-                        cell_list[i].AddToList("KILL YOURSELF");
+                        if (IsInCell(convertedCharLength, cell_list[i], MousePos))
+                        {
+                            cell_list[i].cell_Contents.Add("N");
+                            break;
+                        }
                     }
+                    Console.WriteLine(MousePos);
                 }
             }
-            else if (!isInWindow)
+            
+            if (!isInWindow)
             {
                 Console.WriteLine("Outside game area! Return back to keep playing!");
             }
 
             if (curState == gameStates[0] && !gameModeDetect)
             {
-                if (Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.A && !gameModeDetect)
+                for(int k = 0; k < 10; k++)
                 {
-                    gameModeDetect = true;
-                    curState = gameStates[1];
+                    if (Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.A && !gameModeDetect)
+                    {
+                        gameModeDetect = true;
+                        curState = gameStates[1];
+                    }
                 }
             }
         }
@@ -313,7 +312,7 @@ namespace PVZ_console
             GetWindowRect(consoleHandle, out RECT consoleRect);
 
             double hori = consoleRect.Right - consoleRect.Left;
-            double vert = consoleRect.Top - consoleRect.Bottom;
+            double vert = consoleRect.Bottom - consoleRect.Top;
 
             double convertedLengthHori = hori / Console.WindowWidth;
             double convertedLengthVert = vert / Console.WindowHeight;
@@ -323,11 +322,12 @@ namespace PVZ_console
 
         static bool IsInCell((double, double) conv, Cell cellToCheck, (int, int) mousePOS)
         {
+            (double, double) leftCorner = ((cellToCheck.cornerL.Item1 * conv.Item1) + (cellToCheck.cornerL.Item1 * 2.5), (cellToCheck.cornerL.Item2 * conv.Item2) + (cellToCheck.cornerL.Item2 * 2.5));
+            (double, double) rightCorner = ((cellToCheck.cornerR.Item1 * conv.Item1) + (cellToCheck.cornerL.Item1 * 2.5), (cellToCheck.cornerR.Item2 * conv.Item2) + (cellToCheck.cornerR.Item2 * 2.5));
 
-            bool xAxis = mousePOS.Item1 >= (cellToCheck.cornerL.Item1 * conv.Item1) || mousePOS.Item1 <= (cellToCheck.cornerR.Item1 * conv.Item1);
-            bool yAxis = mousePOS.Item2 <= (cellToCheck.cornerL.Item2 * conv.Item2) || mousePOS.Item2 >= (cellToCheck.cornerR.Item2 * conv.Item2);
-
-            if (xAxis && yAxis)
+            bool isInXRange = (mousePOS.Item1 > leftCorner.Item1) && (mousePOS.Item1 < rightCorner.Item1);
+            bool isInYRange = (mousePOS.Item2 > leftCorner.Item2) && (mousePOS.Item2 < rightCorner.Item2);
+            if (isInXRange && isInYRange)
             {
                 return true;
             }
