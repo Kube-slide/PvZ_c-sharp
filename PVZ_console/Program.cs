@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 namespace PVZ_console
 {
     internal class Program
@@ -322,8 +323,10 @@ namespace PVZ_console
 
         static bool IsInCell((double, double) conv, Cell cellToCheck, (int, int) mousePOS)
         {
-            (double, double) leftCorner = ((cellToCheck.cornerL.Item1 * conv.Item1) + (cellToCheck.cornerL.Item1 * 2.5), (cellToCheck.cornerL.Item2 * conv.Item2) + (cellToCheck.cornerL.Item2 * 2.5));
-            (double, double) rightCorner = ((cellToCheck.cornerR.Item1 * conv.Item1) + (cellToCheck.cornerL.Item1 * 2.5), (cellToCheck.cornerR.Item2 * conv.Item2) + (cellToCheck.cornerR.Item2 * 2.5));
+            double cellRow = Double.Parse(Regex.Matches(cellToCheck.cell_ID, @"\d+").Cast<Match>().Last().Value);
+            double cellRow_Adjusted = Math.Clamp(cellRow - 5, 0, 1000);
+            (double, double) leftCorner = ((cellToCheck.cornerL.Item1 * conv.Item1) - (cellRow_Adjusted * cellRow), (cellToCheck.cornerL.Item2 * conv.Item2) + (1.5 * 13));
+            (double, double) rightCorner = ((cellToCheck.cornerR.Item1 * conv.Item1) - (cellRow_Adjusted * cellRow), (cellToCheck.cornerR.Item2 * conv.Item2) + (1.5 * 13));
 
             bool isInXRange = (mousePOS.Item1 > leftCorner.Item1) && (mousePOS.Item1 < rightCorner.Item1);
             bool isInYRange = (mousePOS.Item2 > leftCorner.Item2) && (mousePOS.Item2 < rightCorner.Item2);

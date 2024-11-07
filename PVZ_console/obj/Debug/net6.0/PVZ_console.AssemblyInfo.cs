@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PVZ_console")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1d53572b47f14966477b4d0e767b535737d20ce6")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c4fa76793b6ed56f0f17f0f516d6f8722885ee1b")]
 [assembly: System.Reflection.AssemblyProductAttribute("PVZ_console")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PVZ_console")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
