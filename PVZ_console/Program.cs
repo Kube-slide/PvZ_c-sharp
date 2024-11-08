@@ -5,16 +5,30 @@ namespace PVZ_console
 {
     internal class Program
     {
-        //global
+        //global variables | Organized as best as my little brain can
+
+        //Entity lists
         static string notesFilePath = @"..\..\..\Entities.txt";
         static List<PlantBrain> plants = new List<PlantBrain>();
         static List<ZombieBrain> zombies = new List<ZombieBrain>();
-        static List<Cell> cell_list = new List<Cell>();
-        static bool preload = false;
+        static List<Projectile> projectiles = new List<Projectile>();
+
+        //In-game storage items
+        static object mouseQueue = null; //variable to store what the mouse currently is storing (either nothing or a plant to place)
+        static List<Cell> cell_list = new List<Cell>(); //list to store every cells' info
+        
+        //Game state checks
         static string[] gameStates = { "Menu", "In-game", "Paused" };
         static string curState = gameStates[0];
+        
+        //Conditional checks for loading
         static bool gameModeDetect = false;
         static bool generatedCells = false;
+        static bool preload = false;
+
+        //==================================================================================================================//
+
+        //External stoopid code to import to make some important window related and mouse related functions work
 
         // We need to use unmanaged code
         [DllImport("user32.dll")]
@@ -42,7 +56,8 @@ namespace PVZ_console
             public int Bottom;
         }
 
-        //Run every function every frame
+
+        //Run necesarry functions every frame
         static void Main(string[] args)
         {
             ScreenSize();
@@ -104,9 +119,15 @@ namespace PVZ_console
                     }
                     else if (line.StartsWith("z_"))
                     {
-                        //Break string into pieces --> store the info in an array and create a plant from given data
+                        //Break string into pieces --> store the info in an array and create a zombie from given data
                         string[] subStrings = line.Split("|", StringSplitOptions.RemoveEmptyEntries);
                         zombies.Add(new ZombieBrain(subStrings[0], subStrings[1]));
+                    }
+                    else if (line.StartsWith("s_"))
+                    {
+                        //Break string into pieces --> store the info in an array and create a zombie from given data
+                        string[] subStrings = line.Split("|", StringSplitOptions.RemoveEmptyEntries);
+                        projectiles.Add(new Projectile(subStrings[0], Convert.ToInt32(subStrings[1])));
                     }
                 }
                 preload = true;
@@ -282,6 +303,7 @@ namespace PVZ_console
                             {
                                 if (IsInCell(convertedCharLength, cell_list[i], MousePos))
                                 {
+                                    DoCellAction(cell_list[i]);
                                     break;
                                 }
                             }
@@ -317,6 +339,7 @@ namespace PVZ_console
             }
         }
 
+        //Convert length of characters in console to global window coords
         static (double, double) CharToWindow()
         {
             //Get our consoleWindow position for reference
@@ -334,6 +357,7 @@ namespace PVZ_console
             return (convertedLengthHori, convertedLengthVert);
         }
 
+        //Check to see if mouse is clicking in a specific cell --> returns bool depending on if mouse is in cell
         static bool IsInCell((double, double) conv, Cell cellToCheck, (int, int) mousePOS)
         {
             double cellRow = Double.Parse(Regex.Matches(cellToCheck.cell_ID, @"\d+").Cast<Match>().Last().Value);
@@ -344,6 +368,32 @@ namespace PVZ_console
             bool isInXRange = (mousePOS.Item1 > leftCorner.Item1) && (mousePOS.Item1 < rightCorner.Item1);
             bool isInYRange = (mousePOS.Item2 > leftCorner.Item2) && (mousePOS.Item2 < rightCorner.Item2);
             return (isInXRange && isInYRange);
+        }
+        
+        //Check the cell we pressed --> do actions related to A. current cell condition | B. current mouse condition
+        static void DoCellAction(Cell cellChecked)
+        {
+            if (cellChecked.cell_Contents.Contains(Projectile)) //Erm what the sigma --> fix this
+            {
+                Console.WriteLine("This cell contains a sun! Pressing the cell collects it");
+                return;
+            }
+            if (mouseQueue != null)
+            {
+                if (!cellChecked.cell_Contents.Contains(PlantBrain)) //Erm what the sigma --> fix this
+                {
+                    Console.WriteLine("This cell contains nothing, you have a plant! You place it on the cell!");
+                    cellChecked.cell_Contents.Add(mouseQueue); //Add mouse content to cell :D
+                    mouseQueue = null; //Return our mouseQueue to contain nothing :)
+                    return;
+                }
+                else
+                {
+                    Console.WriteLine("This cell contains something, you have a plant! You can't place it on the cell!");
+                    return;
+                }
+            }
+            return;
         }
     }
 
@@ -362,7 +412,6 @@ namespace PVZ_console
             Sun_cost = sunCost;
             Shooting_Speed = shootSpeed;
         }
-
     }
 
     //Creating a zombie + executing plant logic -- Unfinished, in fact some may say not even started lol
@@ -405,6 +454,13 @@ namespace PVZ_console
 
     internal class Projectile
     {
+        string projectileName;
+        int projectileSpeed;
 
+        public Projectile(string name,int speed)
+        {
+            projectileName = name;
+            projectileSpeed = speed;
+        }
     }
 }
