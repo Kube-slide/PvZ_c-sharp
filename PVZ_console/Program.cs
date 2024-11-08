@@ -58,7 +58,7 @@ namespace PVZ_console
                 Draw();
             }
             //Sleep for 1/4 of a second --> 4 fps? doesnt flash eyes too bad
-            Thread.Sleep(200);
+            Thread.Sleep(250);
 
             //Clear console (failsafe) and loop :D
             Console.Clear();
@@ -324,9 +324,9 @@ namespace PVZ_console
         static bool IsInCell((double, double) conv, Cell cellToCheck, (int, int) mousePOS)
         {
             double cellRow = Double.Parse(Regex.Matches(cellToCheck.cell_ID, @"\d+").Cast<Match>().Last().Value);
-            double cellRow_Adjusted = Math.Clamp(cellRow - 5, 0, 1000);
-            (double, double) leftCorner = ((cellToCheck.cornerL.Item1 * conv.Item1) - (cellRow_Adjusted * cellRow), (cellToCheck.cornerL.Item2 * conv.Item2) + (1.5 * 13));
-            (double, double) rightCorner = ((cellToCheck.cornerR.Item1 * conv.Item1) - (cellRow_Adjusted * cellRow), (cellToCheck.cornerR.Item2 * conv.Item2) + (1.5 * 13));
+            double cellRow_Adjusted = Math.Clamp(cellRow - 2, 0, 1000);
+            (double, double) leftCorner = ((cellToCheck.cornerL.Item1 * conv.Item1) - (12.5 * cellRow_Adjusted), (cellToCheck.cornerL.Item2 * conv.Item2) + (1.5 * 13));
+            (double, double) rightCorner = ((cellToCheck.cornerR.Item1 * conv.Item1) - (12.5 * cellRow_Adjusted), (cellToCheck.cornerR.Item2 * conv.Item2) + (1.5 * 13));
 
             bool isInXRange = (mousePOS.Item1 > leftCorner.Item1) && (mousePOS.Item1 < rightCorner.Item1);
             bool isInYRange = (mousePOS.Item2 > leftCorner.Item2) && (mousePOS.Item2 < rightCorner.Item2);
