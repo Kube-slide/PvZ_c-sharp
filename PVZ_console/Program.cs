@@ -268,39 +268,52 @@ namespace PVZ_console
             bool isInWindow = WithinWindow();
             (double, double) convertedCharLength = CharToWindow();
 
-            //Check for input WITHOUT blocking script. W/o console.KeyAvailable, the rest of the code would hang :\
-            // Loop this 10 times --> ensures proper input capture
-            for(int k = 0; k < 10; k++)
+            switch (curState)
             {
-                if(Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.Spacebar && isInWindow)
-                {
-                    for (int i = 0; i < cell_list.Count; i++)
+                case "In-game":
+
+                    //Check for input WITHOUT blocking script. W/o console.KeyAvailable, the rest of the code would hang :\
+                    // Loop this 10 times --> ensures proper input capture
+                    for (int k = 0; k < 10; k++)
                     {
-                        if (IsInCell(convertedCharLength, cell_list[i], MousePos))
+                        if (Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.Spacebar && isInWindow)
                         {
-                            cell_list[i].cell_Contents.Add("N");
-                            break;
+                            for (int i = 0; i < cell_list.Count; i++)
+                            {
+                                if (IsInCell(convertedCharLength, cell_list[i], MousePos))
+                                {
+                                    break;
+                                }
+                            }
                         }
                     }
-                    Console.WriteLine(MousePos);
-                }
+
+                    break;
+
+                case "Menu":
+
+                    if (curState == gameStates[0] && !gameModeDetect)
+                    {
+                        for (int k = 0; k < 10; k++)
+                        {
+                            if (Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.A && !gameModeDetect)
+                            {
+                                gameModeDetect = true;
+                                curState = gameStates[1];
+                                break;
+                            }
+                        }
+                    }
+
+                    break;
+
+                case "Pause":
+                    break;
             }
             
             if (!isInWindow)
             {
                 Console.WriteLine("Outside game area! Return back to keep playing!");
-            }
-
-            if (curState == gameStates[0] && !gameModeDetect)
-            {
-                for(int k = 0; k < 10; k++)
-                {
-                    if (Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.A && !gameModeDetect)
-                    {
-                        gameModeDetect = true;
-                        curState = gameStates[1];
-                    }
-                }
             }
         }
 
@@ -325,19 +338,12 @@ namespace PVZ_console
         {
             double cellRow = Double.Parse(Regex.Matches(cellToCheck.cell_ID, @"\d+").Cast<Match>().Last().Value);
             double cellRow_Adjusted = Math.Clamp(cellRow - 2, 0, 1000);
-            (double, double) leftCorner = ((cellToCheck.cornerL.Item1 * conv.Item1) - (12.5 * cellRow_Adjusted), (cellToCheck.cornerL.Item2 * conv.Item2) + (1.5 * 13));
-            (double, double) rightCorner = ((cellToCheck.cornerR.Item1 * conv.Item1) - (12.5 * cellRow_Adjusted), (cellToCheck.cornerR.Item2 * conv.Item2) + (1.5 * 13));
+            (double, double) leftCorner = ((cellToCheck.cornerL.Item1 * conv.Item1) - (13.25 * cellRow_Adjusted), (cellToCheck.cornerL.Item2 * conv.Item2) + (1.5 * 13));
+            (double, double) rightCorner = ((cellToCheck.cornerR.Item1 * conv.Item1) - (13.25 * cellRow_Adjusted), (cellToCheck.cornerR.Item2 * conv.Item2) + (1.5 * 13));
 
             bool isInXRange = (mousePOS.Item1 > leftCorner.Item1) && (mousePOS.Item1 < rightCorner.Item1);
             bool isInYRange = (mousePOS.Item2 > leftCorner.Item2) && (mousePOS.Item2 < rightCorner.Item2);
-            if (isInXRange && isInYRange)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return (isInXRange && isInYRange);
         }
     }
 
