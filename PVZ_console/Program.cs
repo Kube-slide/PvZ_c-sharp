@@ -1,6 +1,8 @@
 ﻿using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Security;
 using System.Text.RegularExpressions;
+using System.Xml.Serialization;
 namespace PVZ_console
 {
     internal class Program
@@ -13,9 +15,15 @@ namespace PVZ_console
         static List<ZombieBrain> zombies = new List<ZombieBrain>();
         static List<Projectile> projectiles = new List<Projectile>();
 
+        //Cell type lists
+        static List<Cell> nonInteract = new List<Cell>();
+        static List<Cell> landSlot = new List<Cell>();
+        static List<Cell> seedSlot = new List<Cell>();
+
         //In-game storage items
         static object mouseQueue = null; //variable to store what the mouse currently is storing (either nothing or a plant to place)
         static List<Cell> cell_list = new List<Cell>(); //list to store every cells' info
+        static int sunQTY = 0; //Player sun qty
         
         //Game state checks
         static string[] gameStates = { "Menu", "In-game", "Paused" };
@@ -156,6 +164,7 @@ namespace PVZ_console
                     break;
                 case "In-game":
                     DIG();
+                    GameLogic();
                     break;
                 case "Paused":
                     Console.WriteLine("Game paused");
@@ -201,7 +210,16 @@ namespace PVZ_console
                 for (int j = 0; j < numOfRows; j++)
                 {
                     string curId = $"{cellRow}{j+1}";
-                    Console.Write($"║{cell_list.Find(Cell => Cell.cell_ID == curId).cell_Contents.Max()}║");
+
+                    //Always print sunQTY for the first cell ; Probably a better way to do this but it works for now
+                    if(curId == "A1")
+                    {
+                        Console.Write($"║{sunQTY}║");
+                    }
+                    else
+                    {
+                        Console.Write($"║{cell_list.Find(Cell => Cell.cell_ID == curId).cell_Contents.Last()}║");
+                    }
                 }
                 Console.Write("\n");
                 for (int j = 0; j < numOfRows; j++)
@@ -222,6 +240,7 @@ namespace PVZ_console
             //Cell_ID tags
             char cellRow = 'A';
 
+            //First : generate all cells
             for (int i = 0; i < Cols; i++)
             {
                 for (int j = 0; j < Rows; j++)
@@ -239,6 +258,23 @@ namespace PVZ_console
                 cellBotRight.Item2 += 3;
                 cellTopLeft.Item1 = 1;
                 cellBotRight.Item1 = 3;
+            }
+
+            //Second : Organize cells in sections (plot, non-interact, seeds)
+            nonInteract.Add(cell_list[0]);
+            for (int i = 10; i < 20; i++)
+            {
+                nonInteract.Add(cell_list[i]);
+            }
+
+            for(int i = 1; i < 10; i++)
+            {
+                seedSlot.Add(cell_list[i]);
+            }
+
+            for(int i = 20; i < cell_list.Count(); i++)
+            {
+                landSlot.Add(cell_list[i]);
             }
         }
 
@@ -292,7 +328,6 @@ namespace PVZ_console
             switch (curState)
             {
                 case "In-game":
-
                     //Check for input WITHOUT blocking script. W/o console.KeyAvailable, the rest of the code would hang :\
                     // Loop this 10 times --> ensures proper input capture
                     for (int k = 0; k < 10; k++)
@@ -304,7 +339,6 @@ namespace PVZ_console
                                 if (IsInCell(convertedCharLength, cell_list[i], MousePos))
                                 {
                                     DoCellAction(cell_list[i]);
-                                    break;
                                 }
                             }
                         }
@@ -373,14 +407,16 @@ namespace PVZ_console
         //Check the cell we pressed --> do actions related to A. current cell condition | B. current mouse condition
         static void DoCellAction(Cell cellChecked)
         {
-            if (cellChecked.cell_Contents.Contains(Projectile)) //Erm what the sigma --> fix this
+            if (cellChecked.cell_Contents.Contains("!")) //temp fix for now
             {
-                Console.WriteLine("This cell contains a sun! Pressing the cell collects it");
+                sunQTY++;
+                sunQTY = Math.Clamp(sunQTY, 0, 9);
+                cellChecked.cell_Contents.Remove("!");
                 return;
             }
             if (mouseQueue != null)
             {
-                if (!cellChecked.cell_Contents.Contains(PlantBrain)) //Erm what the sigma --> fix this
+                if (!cellChecked.cell_Contents.Contains(plants.Any())) //temp fix for now
                 {
                     Console.WriteLine("This cell contains nothing, you have a plant! You place it on the cell!");
                     cellChecked.cell_Contents.Add(mouseQueue); //Add mouse content to cell :D
@@ -393,7 +429,30 @@ namespace PVZ_console
                     return;
                 }
             }
+            if(mouseQueue == null)
+            {
+                Console.WriteLine("Mousequeue is nulL! nothing will happen");
+            }
             return;
+        }
+    
+        static void GameLogic()
+        {
+            //Generate random values for sun spawning. Change genSun and rndLuck max values to change sun generation odds
+            Random rnd = new Random();
+            int placesun = rnd.Next(0, cell_list.Count());
+            int genSun = rnd.Next(0, 25);
+            int rndLuck = rnd.Next(0, 25);
+
+            //Check if the sun can be generated, and if that cell is a landSlot
+            if(genSun == rndLuck && landSlot.Contains(cell_list[placesun]))
+            {
+                //Make sure the cell doesnt already have sun!
+                if (!cell_list[placesun].cell_Contents.Contains("!"))
+                {
+                    cell_list[placesun].cell_Contents.Add("!");
+                }
+            }
         }
     }
 
