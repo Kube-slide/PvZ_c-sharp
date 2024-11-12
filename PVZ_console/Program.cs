@@ -34,6 +34,9 @@ namespace PVZ_console
         static bool generatedCells = false;
         static bool preload = false;
 
+        //In-Game timer for storing game process time
+        static double gameTimer;
+
         //==================================================================================================================//
 
         //External stoopid code to import to make some important window related and mouse related functions work
@@ -83,6 +86,8 @@ namespace PVZ_console
             //Sleep for 1/4 of a second --> 4 fps? doesnt flash eyes too bad
             Thread.Sleep(250);
 
+            if (curState == "In-game")
+                gameTimer += 0.25;
             //Clear console (failsafe) and loop :D
             Console.Clear();
             Main(null);
@@ -97,7 +102,7 @@ namespace PVZ_console
             bool FixedWindow = (Console.WindowHeight != desiredH) && (Console.WindowWidth != desiredW);
             while (FixedWindow)
             {
-                Console.WriteLine($"The desired screen size is {desiredW} by {desiredH}.");
+                Console.WriteLine($"The desired screen size is {desiredW} by 30.");
                 Console.WriteLine($"Currently, the screen size is {Console.WindowWidth} by {Console.WindowHeight}");
                 Console.WriteLine("Make adjustments to the window, then press any key to check again");
                 Console.ReadKey(true);
@@ -123,13 +128,13 @@ namespace PVZ_console
                     {
                         //Break string into pieces --> store the info in an array and create a plant from given data
                         string[] subStrings = line.Split(" | ", StringSplitOptions.RemoveEmptyEntries);
-                        plants.Add(new PlantBrain(subStrings[0], subStrings[1], Convert.ToInt32(subStrings[2]), Convert.ToInt32(subStrings[3])));
+                        plants.Add(new PlantBrain(subStrings[0], subStrings[1], Convert.ToInt32(subStrings[2]), Convert.ToInt32(subStrings[3]), Convert.ToChar(subStrings[4])));
                     }
                     else if (line.StartsWith("z_"))
                     {
                         //Break string into pieces --> store the info in an array and create a zombie from given data
                         string[] subStrings = line.Split("|", StringSplitOptions.RemoveEmptyEntries);
-                        zombies.Add(new ZombieBrain(subStrings[0], subStrings[1]));
+                        zombies.Add(new ZombieBrain(subStrings[0], subStrings[1], Convert.ToChar(subStrings[2])));
                     }
                     else if (line.StartsWith("s_"))
                     {
@@ -270,6 +275,23 @@ namespace PVZ_console
             for(int i = 1; i < 10; i++)
             {
                 seedSlot.Add(cell_list[i]);
+            }
+
+            foreach(PlantBrain possiblePlants in plants)
+            {
+                seedSlot[5].cellContents.Add(possiblePlants.GetType().GetProperty);
+            }
+
+            foreach(Cell pass in nonInteract)
+            {
+                if(pass.cell_Contents.Contains(sunQTY))
+                {
+                    continue;
+                }
+                else
+                {
+                    pass.cell_Contents.Add("-");
+                }
             }
 
             for(int i = 20; i < cell_list.Count(); i++)
@@ -438,14 +460,14 @@ namespace PVZ_console
     
         static void GameLogic()
         {
-            //Generate random values for sun spawning. Change genSun and rndLuck max values to change sun generation odds
+            //genSunTime dictates how many seconds before spawning sun
+                //Divide global timer by this amount to dictate when to spawn sun
             Random rnd = new Random();
             int placesun = rnd.Next(0, cell_list.Count());
-            int genSun = rnd.Next(0, 25);
-            int rndLuck = rnd.Next(0, 25);
+            int genSunTime = 10;
 
             //Check if the sun can be generated, and if that cell is a landSlot
-            if(genSun == rndLuck && landSlot.Contains(cell_list[placesun]))
+            if(gameTimer%genSunTime==0 && landSlot.Contains(cell_list[placesun]))
             {
                 //Make sure the cell doesnt already have sun!
                 if (!cell_list[placesun].cell_Contents.Contains("!"))
@@ -463,13 +485,15 @@ namespace PVZ_console
         public string Plant_Description;
         public int Shooting_Speed;
         public int Sun_cost;
+        public char symbol;
 
-        public PlantBrain(string name, string desc, int sunCost, int shootSpeed)
+        public PlantBrain(string name, string desc, int sunCost, int shootSpeed, char plantSymbol)
         {
             Plant_Name = name;
             Plant_Description = desc;
             Sun_cost = sunCost;
             Shooting_Speed = shootSpeed;
+            symbol = plantSymbol;
         }
     }
 
@@ -478,11 +502,12 @@ namespace PVZ_console
     {
         public string Zombie_Name;
         public string Zombie_Description;
-
-        public ZombieBrain(string name, string desc)
+        public char symbol;
+        public ZombieBrain(string name, string desc, char zombSymbol)
         {
             Zombie_Name = name;
             Zombie_Description = desc;
+            symbol = zombSymbol;
         }
     }
 
