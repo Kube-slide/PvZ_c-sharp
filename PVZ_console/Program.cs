@@ -128,12 +128,12 @@ namespace PVZ_console
                     {
                         //Break string into pieces --> store the info in an array and create a plant from given data
                         string[] subStrings = line.Split(" | ", StringSplitOptions.RemoveEmptyEntries);
-                        plants.Add(new PlantBrain(subStrings[0], subStrings[1], Convert.ToInt32(subStrings[2]), Convert.ToInt32(subStrings[3]), Convert.ToChar(subStrings[4])));
+                        plants.Add(new PlantBrain(subStrings[0], subStrings[1], Convert.ToInt32(subStrings[2]), Convert.ToInt32(subStrings[3]), subStrings[4]));
                     }
                     else if (line.StartsWith("z_"))
                     {
                         //Break string into pieces --> store the info in an array and create a zombie from given data
-                        string[] subStrings = line.Split("|", StringSplitOptions.RemoveEmptyEntries);
+                        string[] subStrings = line.Split(" | ", StringSplitOptions.RemoveEmptyEntries);
                         zombies.Add(new ZombieBrain(subStrings[0], subStrings[1], Convert.ToChar(subStrings[2])));
                     }
                     else if (line.StartsWith("s_"))
@@ -277,12 +277,12 @@ namespace PVZ_console
                 seedSlot.Add(cell_list[i]);
             }
 
-            foreach(PlantBrain possiblePlants in plants)
+            for(int i = 0; i < plants.Count; i++)
             {
-                seedSlot[5].cellContents.Add(possiblePlants.GetType().GetProperty);
+                seedSlot[i].cell_Contents.Add(plants[i].symbol);
             }
 
-            foreach(Cell pass in nonInteract)
+            foreach (Cell pass in nonInteract)
             {
                 if(pass.cell_Contents.Contains(sunQTY))
                 {
@@ -485,9 +485,9 @@ namespace PVZ_console
         public string Plant_Description;
         public int Shooting_Speed;
         public int Sun_cost;
-        public char symbol;
+        public string symbol;
 
-        public PlantBrain(string name, string desc, int sunCost, int shootSpeed, char plantSymbol)
+        public PlantBrain(string name, string desc, int sunCost, int shootSpeed, string plantSymbol)
         {
             Plant_Name = name;
             Plant_Description = desc;

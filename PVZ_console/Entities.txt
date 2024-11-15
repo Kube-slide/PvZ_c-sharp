@@ -1,12 +1,12 @@
 ---------------===============         Plants          ===============---------------
 
-p_Peashooter | Shoots 1 pea every 3 seconds | 100 | 3 | p
-p_Sunflower | Spawns 1 sun every 5 seconds | 50 | 5 | s
-p_WallNut | Eats upto 5 zombie attacks | 50 | 0 | w
+p_Peashooter | Shoots 1 pea every 3 seconds | 4 | 3 | p
+p_Sunflower | Spawns 1 sun every 5 seconds | 2 | 5 | s
+p_WallNut | Eats upto 5 zombie attacks | 2 | 0 | w
 
 ---------------===============        Zombies          ===============---------------
 
-z_GenericZombie  |Moves 1 tile every 2 second and attacks every 2.5 second | z
+z_GenericZombie  | Moves 1 tile every 2 second and attacks every 2.5 second | z
 z_PoleVolter | Moves 1 tile every 1.5 second and attacks every 2.5 second | v
 z_MiniZomb | Moves 1 tiles every 2 second and attacks every 1.75 second | m
 
