@@ -418,8 +418,8 @@ namespace PVZ_console
         {
             double cellRow = Double.Parse(Regex.Matches(cellToCheck.cell_ID, @"\d+").Cast<Match>().Last().Value);
             double cellRow_Adjusted = Math.Clamp(cellRow - 2, 0, 1000);
-            (double, double) leftCorner = ((cellToCheck.cornerL.Item1 * conv.Item1) - (13.25 * cellRow_Adjusted), (cellToCheck.cornerL.Item2 * conv.Item2) + (1.5 * 13));
-            (double, double) rightCorner = ((cellToCheck.cornerR.Item1 * conv.Item1) - (13.25 * cellRow_Adjusted), (cellToCheck.cornerR.Item2 * conv.Item2) + (1.5 * 13));
+            (double, double) leftCorner = ((cellToCheck.cornerL.Item1 * conv.Item1) - (13.25 * cellRow_Adjusted), (cellToCheck.cornerL.Item2 * conv.Item2) + (0.85 * 13));
+            (double, double) rightCorner = ((cellToCheck.cornerR.Item1 * conv.Item1) - (13.25 * cellRow_Adjusted), (cellToCheck.cornerR.Item2 * conv.Item2) + (0.85 * 13));
 
             bool isInXRange = (mousePOS.Item1 > leftCorner.Item1) && (mousePOS.Item1 < rightCorner.Item1);
             bool isInYRange = (mousePOS.Item2 > leftCorner.Item2) && (mousePOS.Item2 < rightCorner.Item2);
@@ -436,25 +436,57 @@ namespace PVZ_console
                 cellChecked.cell_Contents.Remove("!");
                 return;
             }
-            if (mouseQueue != null)
+
+            if (seedSlot.Contains(cellChecked))
             {
-                if (!cellChecked.cell_Contents.Contains(plants.Any())) //temp fix for now
+                if(mouseQueue == null)
                 {
-                    Console.WriteLine("This cell contains nothing, you have a plant! You place it on the cell!");
-                    cellChecked.cell_Contents.Add(mouseQueue); //Add mouse content to cell :D
-                    mouseQueue = null; //Return our mouseQueue to contain nothing :)
-                    return;
+                    PlantBrain plantInSeed = null;
+                    foreach(PlantBrain plant in plants)
+                    {
+                        if(plant.symbol == cellChecked.cell_Contents.Last())
+                        {
+                            plantInSeed = plant;
+                            break;
+                        }
+                    }
+
+                    if(sunQTY >= plantInSeed.Sun_cost)
+                    {
+                        mouseQueue = cellChecked.cell_Contents.Last();
+                        sunQTY = sunQTY - plantInSeed.Sun_cost;
+                    }
                 }
-                else
+            }
+            else if (landSlot.Contains(cellChecked))
+            {
+                if(mouseQueue != null && cellChecked.cell_Contents.Count == 1)
                 {
-                    Console.WriteLine("This cell contains something, you have a plant! You can't place it on the cell!");
+                    cellChecked.cell_Contents.Add(mouseQueue);
+                    mouseQueue = null;
                     return;
                 }
             }
-            if(mouseQueue == null)
-            {
-                Console.WriteLine("Mousequeue is nulL! nothing will happen");
-            }
+
+            //if (mouseQueue != null)
+            //{
+            //    if (!cellChecked.cell_Contents.Contains(plants.Any())) //temp fix for now
+            //    {
+            //        Console.WriteLine("This cell contains nothing, you have a plant! You place it on the cell!");
+            //        cellChecked.cell_Contents.Add(mouseQueue); //Add mouse content to cell :D
+            //        mouseQueue = null; //Return our mouseQueue to contain nothing :)
+            //        return;
+            //    }
+            //    else
+            //    {
+            //        Console.WriteLine("This cell contains something, you have a plant! You can't place it on the cell!");
+            //        return;
+            //    }
+            //}
+            //if(mouseQueue == null)
+            //{
+            //    Console.WriteLine("Mousequeue is nulL! nothing will happen");
+            //}
             return;
         }
     
@@ -464,7 +496,7 @@ namespace PVZ_console
                 //Divide global timer by this amount to dictate when to spawn sun
             Random rnd = new Random();
             int placesun = rnd.Next(0, cell_list.Count());
-            int genSunTime = 10;
+            int genSunTime = 5;
 
             //Check if the sun can be generated, and if that cell is a landSlot
             if(gameTimer%genSunTime==0 && landSlot.Contains(cell_list[placesun]))
@@ -473,6 +505,17 @@ namespace PVZ_console
                 if (!cell_list[placesun].cell_Contents.Contains("!"))
                 {
                     cell_list[placesun].cell_Contents.Add("!");
+                }
+
+                foreach(Cell cell in landSlot)
+                {
+                    if (cell.cell_Contents.Contains("s"))
+                    {
+                        if (gameTimer % genSunTime == 0)
+                        {
+                            cell.cell_Contents.Add("!");
+                        }
+                    }
                 }
             }
         }
