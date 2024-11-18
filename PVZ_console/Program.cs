@@ -1,8 +1,7 @@
 ﻿using System.Drawing;
+using System.Numerics;
 using System.Runtime.InteropServices;
-using System.Security;
 using System.Text.RegularExpressions;
-using System.Xml.Serialization;
 namespace PVZ_console
 {
     internal class Program
@@ -24,11 +23,11 @@ namespace PVZ_console
         static object mouseQueue = null; //variable to store what the mouse currently is storing (either nothing or a plant to place)
         static List<Cell> cell_list = new List<Cell>(); //list to store every cells' info
         static int sunQTY = 0; //Player sun qty
-        
+
         //Game state checks
         static string[] gameStates = { "Menu", "In-game", "Paused" };
         static string curState = gameStates[0];
-        
+
         //Conditional checks for loading
         static bool gameModeDetect = false;
         static bool generatedCells = false;
@@ -36,7 +35,6 @@ namespace PVZ_console
 
         //In-Game timer for storing game process time
         static double gameTimer;
-
         //==================================================================================================================//
 
         //External stoopid code to import to make some important window related and mouse related functions work
@@ -105,6 +103,7 @@ namespace PVZ_console
                 Console.WriteLine($"The desired screen size is {desiredW} by 30.");
                 Console.WriteLine($"Currently, the screen size is {Console.WindowWidth} by {Console.WindowHeight}");
                 Console.WriteLine("Make adjustments to the window, then press any key to check again");
+                Console.WriteLine("WARNING!!! DO NOT ADJUST TEXT SIZE, OTHERWISE CELL SPACING WILL BREAK! YOU WILL NOT BE ABLE TO PLAY THE GAME!");
                 Console.ReadKey(true);
                 Console.Clear();
                 FixedWindow = (Console.WindowHeight != desiredH) && (Console.WindowWidth != desiredW);
@@ -128,13 +127,13 @@ namespace PVZ_console
                     {
                         //Break string into pieces --> store the info in an array and create a plant from given data
                         string[] subStrings = line.Split(" | ", StringSplitOptions.RemoveEmptyEntries);
-                        plants.Add(new PlantBrain(subStrings[0], subStrings[1], Convert.ToInt32(subStrings[2]), Convert.ToInt32(subStrings[3]), subStrings[4]));
+                        plants.Add(new PlantBrain(subStrings[0], subStrings[1], Convert.ToInt32(subStrings[2]), Convert.ToInt32(subStrings[3]), subStrings[4], subStrings[5]));
                     }
                     else if (line.StartsWith("z_"))
                     {
                         //Break string into pieces --> store the info in an array and create a zombie from given data
                         string[] subStrings = line.Split(" | ", StringSplitOptions.RemoveEmptyEntries);
-                        zombies.Add(new ZombieBrain(subStrings[0], subStrings[1], Convert.ToChar(subStrings[2])));
+                        zombies.Add(new ZombieBrain(subStrings[0], subStrings[1], subStrings[2], subStrings[3]));
                     }
                     else if (line.StartsWith("s_"))
                     {
@@ -214,16 +213,65 @@ namespace PVZ_console
                 Console.Write("\n");
                 for (int j = 0; j < numOfRows; j++)
                 {
-                    string curId = $"{cellRow}{j+1}";
+                    string curId = $"{cellRow}{j + 1}";
 
                     //Always print sunQTY for the first cell ; Probably a better way to do this but it works for now
-                    if(curId == "A1")
+                    if (curId == "A1")
                     {
-                        Console.Write($"║{sunQTY}║");
+                        Console.ResetColor();
+                        Console.Write("║");
+                        Console.ForegroundColor = ConsoleColor.DarkYellow;
+                        Console.Write(sunQTY);
+                        Console.ResetColor();
+                        Console.Write("║");
                     }
                     else
                     {
-                        Console.Write($"║{cell_list.Find(Cell => Cell.cell_ID == curId).cell_Contents.Last()}║");
+                        var displayedChar = cell_list.Find(Cell => Cell.cell_ID == curId).cell_Contents.Last();
+
+                        foreach (PlantBrain plant in plants)
+                        {
+                            if (displayedChar == plant.symbol)
+                            {
+                                Console.ResetColor();
+                                Console.Write("║");
+                                Console.ForegroundColor = SetConsoleColor(plant.color);
+                                Console.Write(plant.symbol);
+                                Console.ResetColor();
+                                Console.Write("║");
+
+                                break;
+                            }
+                        }
+
+                        foreach (ZombieBrain zomb in zombies)
+                        {
+                            if (displayedChar == zomb.symbol)
+                            {
+                                Console.ResetColor();
+                                Console.Write("║");
+                                Console.ForegroundColor = SetConsoleColor(zomb.color);
+                                Console.Write(zomb.symbol);
+                                Console.ResetColor();
+                                Console.Write("║");
+
+                                break;
+                            }
+                        }
+
+                        if (displayedChar == "!")
+                        {
+                            Console.ResetColor();
+                            Console.Write("║");
+                            Console.ForegroundColor = ConsoleColor.DarkYellow;
+                            Console.Write("!");
+                            Console.ResetColor();
+                            Console.Write("║");
+                        }
+                        else if (displayedChar == " " || displayedChar == "-")
+                        {
+                            Console.Write($"║{displayedChar}║");
+                        }
                     }
                 }
                 Console.Write("\n");
@@ -233,6 +281,47 @@ namespace PVZ_console
                 }
                 cellRow++;
                 Console.Write("\n");
+            }
+        }
+
+        static ConsoleColor SetConsoleColor(string color)
+        {
+            switch (color)
+            {
+                case "Black":
+                    return ConsoleColor.Black;
+                case "DarkBlue":
+                    return ConsoleColor.DarkBlue;
+                case "DarkGreen":
+                    return ConsoleColor.DarkGreen;
+                case "DarkCyan":
+                    return ConsoleColor.DarkCyan;
+                case "DarkRed":
+                    return ConsoleColor.DarkRed;
+                case "DarkMagenta":
+                    return ConsoleColor.DarkMagenta;
+                case "DarkYellow":
+                    return ConsoleColor.DarkYellow;
+                case "Gray":
+                    return ConsoleColor.Gray;
+                case "DarkGray":
+                    return ConsoleColor.DarkGray;
+                case "Blue":
+                    return ConsoleColor.Blue;
+                case "Green":
+                    return ConsoleColor.Green;
+                case "Cyan":
+                    return ConsoleColor.Cyan;
+                case "Red":
+                    return ConsoleColor.Red;
+                case "Magenta":
+                    return ConsoleColor.Magenta;
+                case "Yellow":
+                    return ConsoleColor.Yellow;
+                case "White":
+                    return ConsoleColor.White;
+                default:
+                    return ConsoleColor.Red;
             }
         }
 
@@ -253,7 +342,7 @@ namespace PVZ_console
                     List<object> cellObjs = new List<object>();
 
                     cellObjs.Add(" ");
-                    cell_list.Add(new Cell($"{cellRow}{j+1}", cellTopLeft, cellBotRight, cellObjs));
+                    cell_list.Add(new Cell($"{cellRow}{j + 1}", cellTopLeft, cellBotRight, cellObjs));
 
                     cellTopLeft.Item1 += 4;
                     cellBotRight.Item1 += 4;
@@ -272,19 +361,19 @@ namespace PVZ_console
                 nonInteract.Add(cell_list[i]);
             }
 
-            for(int i = 1; i < 10; i++)
+            for (int i = 1; i < 10; i++)
             {
                 seedSlot.Add(cell_list[i]);
             }
 
-            for(int i = 0; i < plants.Count; i++)
+            for (int i = 0; i < plants.Count; i++)
             {
                 seedSlot[i].cell_Contents.Add(plants[i].symbol);
             }
 
             foreach (Cell pass in nonInteract)
             {
-                if(pass.cell_Contents.Contains(sunQTY))
+                if (pass.cell_Contents.Contains(sunQTY))
                 {
                     continue;
                 }
@@ -294,7 +383,7 @@ namespace PVZ_console
                 }
             }
 
-            for(int i = 20; i < cell_list.Count(); i++)
+            for (int i = 20; i < cell_list.Count(); i++)
             {
                 landSlot.Add(cell_list[i]);
             }
@@ -388,7 +477,7 @@ namespace PVZ_console
                 case "Pause":
                     break;
             }
-            
+
             if (!isInWindow)
             {
                 Console.WriteLine("Outside game area! Return back to keep playing!");
@@ -425,7 +514,7 @@ namespace PVZ_console
             bool isInYRange = (mousePOS.Item2 > leftCorner.Item2) && (mousePOS.Item2 < rightCorner.Item2);
             return (isInXRange && isInYRange);
         }
-        
+
         //Check the cell we pressed --> do actions related to A. current cell condition | B. current mouse condition
         static void DoCellAction(Cell cellChecked)
         {
@@ -439,19 +528,19 @@ namespace PVZ_console
 
             if (seedSlot.Contains(cellChecked))
             {
-                if(mouseQueue == null)
+                if (mouseQueue == null)
                 {
                     PlantBrain plantInSeed = null;
-                    foreach(PlantBrain plant in plants)
+                    foreach (PlantBrain plant in plants)
                     {
-                        if(plant.symbol == cellChecked.cell_Contents.Last())
+                        if (plant.symbol == cellChecked.cell_Contents.Last())
                         {
                             plantInSeed = plant;
                             break;
                         }
                     }
 
-                    if(sunQTY >= plantInSeed.Sun_cost)
+                    if (sunQTY >= plantInSeed.Sun_cost)
                     {
                         mouseQueue = cellChecked.cell_Contents.Last();
                         sunQTY = sunQTY - plantInSeed.Sun_cost;
@@ -460,7 +549,7 @@ namespace PVZ_console
             }
             else if (landSlot.Contains(cellChecked))
             {
-                if(mouseQueue != null && cellChecked.cell_Contents.Count == 1)
+                if (mouseQueue != null && cellChecked.cell_Contents.Count == 1)
                 {
                     cellChecked.cell_Contents.Add(mouseQueue);
                     mouseQueue = null;
@@ -489,17 +578,17 @@ namespace PVZ_console
             //}
             return;
         }
-    
+
         static void GameLogic()
         {
             //genSunTime dictates how many seconds before spawning sun
-                //Divide global timer by this amount to dictate when to spawn sun
+            //Divide global timer by this amount to dictate when to spawn sun
             Random rnd = new Random();
             int placesun = rnd.Next(0, cell_list.Count());
             int genSunTime = 5;
 
             //Check if the sun can be generated, and if that cell is a landSlot
-            if(gameTimer%genSunTime==0 && landSlot.Contains(cell_list[placesun]))
+            if (gameTimer % genSunTime == 0 && landSlot.Contains(cell_list[placesun]))
             {
                 //Make sure the cell doesnt already have sun!
                 if (!cell_list[placesun].cell_Contents.Contains("!"))
@@ -507,7 +596,7 @@ namespace PVZ_console
                     cell_list[placesun].cell_Contents.Add("!");
                 }
 
-                foreach(Cell cell in landSlot)
+                foreach (Cell cell in landSlot)
                 {
                     if (cell.cell_Contents.Contains("s"))
                     {
@@ -529,14 +618,16 @@ namespace PVZ_console
         public int Shooting_Speed;
         public int Sun_cost;
         public string symbol;
+        public string color;
 
-        public PlantBrain(string name, string desc, int sunCost, int shootSpeed, string plantSymbol)
+        public PlantBrain(string name, string desc, int sunCost, int shootSpeed, string plantSymbol, string plantColor)
         {
             Plant_Name = name;
             Plant_Description = desc;
             Sun_cost = sunCost;
             Shooting_Speed = shootSpeed;
             symbol = plantSymbol;
+            color = plantColor;
         }
     }
 
@@ -545,12 +636,14 @@ namespace PVZ_console
     {
         public string Zombie_Name;
         public string Zombie_Description;
-        public char symbol;
-        public ZombieBrain(string name, string desc, char zombSymbol)
+        public string symbol;
+        public string color;
+        public ZombieBrain(string name, string desc, string zombSymbol, string zombColor)
         {
             Zombie_Name = name;
             Zombie_Description = desc;
             symbol = zombSymbol;
+            color = zombColor;
         }
     }
 
@@ -584,7 +677,7 @@ namespace PVZ_console
         string projectileName;
         int projectileSpeed;
 
-        public Projectile(string name,int speed)
+        public Projectile(string name, int speed)
         {
             projectileName = name;
             projectileSpeed = speed;
