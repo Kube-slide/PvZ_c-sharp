@@ -27,6 +27,7 @@ namespace PVZ_console
         //Game state checks
         static string[] gameStates = { "Menu", "In-game", "Paused" };
         static string curState = gameStates[0];
+        static object lastMovedProj = null;
 
         //Conditional checks for loading
         static bool gameModeDetect = false;
@@ -94,13 +95,13 @@ namespace PVZ_console
         //Force screen size to display everything adequatly
         static void ScreenSize()
         {
-            int desiredH = 27;
+            int desiredH = 30;
             int desiredW = 60;
 
             bool FixedWindow = (Console.WindowHeight != desiredH) && (Console.WindowWidth != desiredW);
             while (FixedWindow)
             {
-                Console.WriteLine($"The desired screen size is {desiredW} by 30.");
+                Console.WriteLine($"The desired screen size is {desiredW} by {desiredH}.");
                 Console.WriteLine($"Currently, the screen size is {Console.WindowWidth} by {Console.WindowHeight}");
                 Console.WriteLine("Make adjustments to the window, then press any key to check again");
                 Console.WriteLine("WARNING!!! DO NOT ADJUST TEXT SIZE, OTHERWISE CELL SPACING WILL BREAK! YOU WILL NOT BE ABLE TO PLAY THE GAME!");
@@ -151,7 +152,6 @@ namespace PVZ_console
         {
             //Clear previous frame
             Console.Clear();
-
             //Check our current state --> outdated method imo but works for now ig
             switch (curState)
             {
@@ -161,6 +161,7 @@ namespace PVZ_console
                 case "In-game":
                     DIG();
                     GameLogic();
+                    lastMovedProj = null;
                     break;
                 case "Paused":
                     Console.WriteLine("Game paused");
@@ -589,49 +590,35 @@ namespace PVZ_console
                 {
                     cell_list[placesun].cell_Contents.Add("!");
                 }
-                for(int i = 0; i < landSlot.Count; i++)
+                foreach(Cell cell in landSlot)
                 {
-                    if (landSlot[i].cell_Contents.Contains("s"))
+                    if (cell.cell_Contents.Contains("s"))
                     {
                         if (gameTimer % genSunTime == 0)
                         {
-                            landSlot[i].cell_Contents.Add("!");
+                            cell.cell_Contents.Add("!");
                         }
                     }
-                    if (landSlot[i].cell_Contents.Contains("p"))
+                    if (cell.cell_Contents.Contains("p"))
                     {
-                        if(gameTimer % genSunTime == 0)
+                        if(gameTimer % 10 == 0)
                         {
-                            landSlot[i].cell_Contents.Add("o");
+                            cell.cell_Contents.Add("o");
                         }
                     }
-                    if (landSlot[i].cell_Contents.Contains("o"))
+
+                    //Somehow only move every Projectile ONCE!
+                    if (cell.cell_Contents.Contains("o") && cell != lastMovedProj)
                     {
-                        if(gameTimer % 2 == 0)
-                        {
-                            landSlot[i].cell_Contents.Remove("o");
-                            landSlot[1].cell_Contents.Add("o");
-                        }
+                        int index = landSlot.FindIndex(a => a == cell);
+                        int nextValue = index + 1;
+
+                        landSlot[index].cell_Contents.Remove("o");
+
+                        landSlot[nextValue].cell_Contents.Add("o");
+                        lastMovedProj = landSlot[nextValue];
                     }
                 }
-
-                //foreach (Cell cell in landSlot)
-                //{
-                //    if (cell.cell_Contents.Contains("s"))
-                //    {
-                //        if (gameTimer % genSunTime == 0)
-                //        {
-                //            cell.cell_Contents.Add("!");
-                //        }
-                //    }
-                //    else if (cell.cell_Contents.Contains("p") && !cell.cell_Contents.Contains("o"))
-                //    {
-                //        if (gameTimer % genSunTime == 0)
-                //        {
-                //            cell.cell_Contents.Add("o");
-                //        }
-                //    }
-                //}
             }
         }
     }
