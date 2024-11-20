@@ -1,6 +1,6 @@
----------------===============         Plants          ===============---------------
+﻿---------------===============         Plants          ===============---------------
 
-p_Peashooter | Shoots 1 pea every 3 seconds | 4 | 3 | p | Green
+p_Peashooter | Shoots 1 pea every 3 seconds | 0 | 3 | p | Green
 p_Sunflower | Spawns 1 sun every 5 seconds | 2 | 5 | s | Yellow
 p_WallNut | Eats upto 5 zombie attacks | 2 | 0 | w | DarkRed
 
@@ -12,5 +12,5 @@ z_MiniZomb | Moves 1 tiles every 2 second and attacks every 1.75 second | m | Gr
 
 ---------------===============       Projectiles          ===============---------------
 
-s_Sun | 1
-s_Pea | 1
+s_Sun|1|UNBOUND_ERROR|Green
+s_Pea|1|o|Green
