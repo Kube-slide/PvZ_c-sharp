@@ -21,7 +21,7 @@ namespace PVZ_console
         //In-game storage items
         static object mouseQueue = null; //variable to store what the mouse currently is storing (either nothing or a plant to place)
         static List<Cell> cell_list = new List<Cell>(); //list to store every cells' info
-        static Dictionary<Cell, int> newCellTimers = new Dictionary<Cell, int>();
+        static Dictionary<Cell, double> newCellTimers = new Dictionary<Cell, double>();
         static int sunQTY = 0; //Player sun qty
 
         //Game state checks
@@ -565,9 +565,8 @@ namespace PVZ_console
                 {
                     cellChecked.cell_Contents.Add(mouseQueue);
                     mouseQueue = null;
-                    Random rnd = new Random();
-                    int genTimer = rnd.Next(1, 5);
-                    newCellTimers.Add(cellChecked, genTimer);
+
+                    newCellTimers.Add(cellChecked, gameTimer);
                     return;
                 }
             }
@@ -590,37 +589,47 @@ namespace PVZ_console
                 {
                     cell_list[placesun].cell_Contents.Add("!");
                 }
-                foreach(Cell cell in landSlot)
+            }
+
+            foreach (Cell cell in landSlot)
+            {
+                if (cell.cell_Contents.Contains("s"))
                 {
-                    if (cell.cell_Contents.Contains("s"))
+                    if ((gameTimer - newCellTimers[cell]) % plants[1].Shooting_Speed == 0)
                     {
-                        if (gameTimer % genSunTime == 0)
-                        {
-                            cell.cell_Contents.Add("!");
-                        }
+                        cell.cell_Contents.Add("!");
                     }
-                    if (cell.cell_Contents.Contains("p"))
+                }
+                if (cell.cell_Contents.Contains("p"))
+                {
+                    if ((gameTimer - newCellTimers[cell]) % plants[0].Shooting_Speed == 0)
                     {
-                        if(gameTimer % 10 == 0)
-                        {
-                            cell.cell_Contents.Add("o");
-                        }
+                        cell.cell_Contents.Add("o");
                     }
+                }
 
-                    //Somehow only move every Projectile ONCE!
-                    if (cell.cell_Contents.Contains("o") && cell != lastMovedProj)
+                //Somehow only move every Projectile ONCE!
+                if (cell.cell_Contents.Contains("o") && cell != lastMovedProj)
+                {
+                    int index = landSlot.FindIndex(a => a == cell);
+                    Regex rgx = new Regex(@"\D+");
+                    string indexRow = rgx.Match(landSlot[index].cell_ID).Value;
+                    int nextValue = index + 1;
+                    string nextValueRow = null;
+                    if(nextValue < landSlot.Count)
                     {
-                        int index = landSlot.FindIndex(a => a == cell);
-                        int nextValue = index + 1;
+                        nextValueRow = rgx.Match(landSlot[nextValue].cell_ID).Value;
+                    }
+                    landSlot[index].cell_Contents.Remove("o");
 
-                        landSlot[index].cell_Contents.Remove("o");
-
+                    if(nextValueRow == indexRow && nextValue <= landSlot.Count)
+                    {
                         landSlot[nextValue].cell_Contents.Add("o");
                         lastMovedProj = landSlot[nextValue];
                     }
                 }
             }
-        }
+            }
     }
 
     //Creating a plant + executing plant logic -- Unfinished, in fact some may say not even started lol
