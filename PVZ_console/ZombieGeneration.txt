@@ -1,0 +1,16 @@
+To add a zombie to generate, start line with the following: zgen_ | ...zombieinfostuff...
+
+Formatting levels is as follows : [level#] | [zombie type] | [spawn row] | [spawn time] | [#zombies defeated T/F?] [#Zombies defeated (default to 0 if no need)]
+
+Declare levels by using _lvl#_ //Currently unused
+
+
+-----------SPECIAL CODES FOR SOME EVENTS------------
+yet to implement. idk what special events could happen ngl
+
+-------------------------LEVEL 1------------------------------
+zgen_ | 1 | z_GenericZombie | E | 10 | false | 0
+zgen_ | 1 | z_PoleVolter | C | 25 | false | 0
+zgen_ | 1 | z_GenericZombie | G | 12 | false | 0
+zgen_ | 1 | z_MiniZomb | D | 17 | false | 0
+zgen_ | 1 | z_GenericZombie | C | 20 | false | 0

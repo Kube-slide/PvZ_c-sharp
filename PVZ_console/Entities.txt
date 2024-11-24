@@ -6,9 +6,9 @@ p_WallNut | Eats upto 5 zombie attacks | 2 | 0 | w | DarkRed
 
 ---------------===============        Zombies          ===============---------------
 
-z_GenericZombie  | Moves 1 tile every 2 second and attacks every 2.5 second | z | DarkGreen
-z_PoleVolter | Moves 1 tile every 1.5 second and attacks every 2.5 second | v | Blue
-z_MiniZomb | Moves 1 tiles every 2 second and attacks every 1.75 second | m | Gray
+z_GenericZombie  | Moves 1 tile every 2 second and attacks every 2.5 second | z | DarkGreen | 5
+z_PoleVolter | Moves 1 tile every 1.5 second and attacks every 2.5 second | v | Blue | 4
+z_MiniZomb | Moves 1 tiles every 2 second and attacks every 1.75 second | m | Gray | 0.25
 
 ---------------===============       Projectiles          ===============---------------
 
