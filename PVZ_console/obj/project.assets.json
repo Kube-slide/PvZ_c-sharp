@@ -8,19 +8,24 @@
     "net6.0": []
   },
   "packageFolders": {
-    "C:\\Users\\rajaa\\.nuget\\packages\\": {}
+    "C:\\Users\\2477548\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\rajaa\\Documents\\Git\\PvZ_c-sharp\\PVZ_console\\PVZ_console.csproj",
+      "projectUniqueName": "C:\\Users\\2477548\\Documents\\GitHub\\PvZ_c-sharp\\PVZ_console\\PVZ_console.csproj",
       "projectName": "PVZ_console",
-      "projectPath": "C:\\Users\\rajaa\\Documents\\Git\\PvZ_c-sharp\\PVZ_console\\PVZ_console.csproj",
-      "packagesPath": "C:\\Users\\rajaa\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\rajaa\\Documents\\Git\\PvZ_c-sharp\\PVZ_console\\obj\\",
+      "projectPath": "C:\\Users\\2477548\\Documents\\GitHub\\PvZ_c-sharp\\PVZ_console\\PVZ_console.csproj",
+      "packagesPath": "C:\\Users\\2477548\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\2477548\\Documents\\GitHub\\PvZ_c-sharp\\PVZ_console\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "C:\\Users\\rajaa\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\2477548\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -28,6 +33,7 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -61,24 +67,6 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
-        "downloadDependencies": [
-          {
-            "name": "Microsoft.AspNetCore.App.Ref",
-            "version": "[6.0.33, 6.0.33]"
-          },
-          {
-            "name": "Microsoft.NETCore.App.Host.win-x64",
-            "version": "[6.0.33, 6.0.33]"
-          },
-          {
-            "name": "Microsoft.NETCore.App.Ref",
-            "version": "[6.0.33, 6.0.33]"
-          },
-          {
-            "name": "Microsoft.WindowsDesktop.App.Ref",
-            "version": "[6.0.33, 6.0.33]"
-          }
-        ],
         "frameworkReferences": {
           "Microsoft.NETCore.App": {
             "privateAssets": "all"

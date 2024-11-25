@@ -84,6 +84,7 @@ namespace PVZ_console
             }
             else
             {
+                Console.SetCursorPosition(0, 0);
                 Draw();
             }
             //Sleep for 1/4 of a second --> 4 fps? doesnt flash eyes too bad
@@ -138,7 +139,7 @@ namespace PVZ_console
                     {
                         //Break string into pieces --> store the info in an array and create a zombie from given data
                         string[] subStrings = line.Split(" | ", StringSplitOptions.RemoveEmptyEntries);
-                        zombies.Add(new ZombieBrain(subStrings[0], subStrings[1], subStrings[2], subStrings[3], Convert.ToDouble(subStrings[4])));
+                        zombies.Add(new ZombieBrain(subStrings[0], subStrings[1], subStrings[2], subStrings[3], Convert.ToDouble(subStrings[4]), Convert.ToInt16(subStrings[5])));
                     }
                     else if (line.StartsWith("s_"))
                     {
@@ -178,6 +179,7 @@ namespace PVZ_console
         {
             //Clear previous frame
             Console.Clear();
+            Console.SetCursorPosition(0, 0);
             //Check our current state --> outdated method imo but works for now ig
             switch (curState)
             {
@@ -222,6 +224,8 @@ namespace PVZ_console
             string cellBot = "╚═╝";
 
             char cellRow = 'A';
+
+            Console.SetCursorPosition(0, 0);
 
             for (int i = 0; i < numOfCols; i++)
             {
@@ -628,7 +632,8 @@ namespace PVZ_console
                 }
                 if (cell.cell_Contents.Contains(plants[0]))
                 {
-                    if ((gameTimer - newCellTimers[cell]) % plants[0].Shooting_Speed == 0)
+                    bool alreadyShot = false;
+                    if ((gameTimer - newCellTimers[cell]) % plants[0].Shooting_Speed == 0 && !alreadyShot)
                     {
                         Regex rgx = new Regex(@"\D");
                         string cellLetter = rgx.Match(cell.cell_ID).Value;
@@ -638,9 +643,11 @@ namespace PVZ_console
                             {
                                 foreach(ZombieBrain zomb in zombies)
                                 {
-                                    if (landSlot[i].cell_Contents.Contains(zomb))
+                                    if (landSlot[i].cell_Contents.Contains(zomb) && !alreadyShot)
                                     {
                                         cell.cell_Contents.Add(projectiles[1]);
+                                        alreadyShot = true;
+                                        break;
                                     }
                                 }
                             }
@@ -663,10 +670,18 @@ namespace PVZ_console
 
                     if (landSlot[index].cell_Contents.Contains(zombies[0]) || landSlot[nextValue].cell_Contents.Contains(zombies[0]))
                     {
-                        landSlot[index].cell_Contents.Remove(zombies[0]);
                         landSlot[index].cell_Contents.Remove(projectiles[1]);
-                        landSlot[nextValue].cell_Contents.Remove(zombies[0]);
                         landSlot[nextValue].cell_Contents.Remove(projectiles[1]);
+                        if (landSlot[index].cell_Contents.Contains(zombies[0]))
+                        {
+                            ZombieBrain zomb = landSlot[index].cell_Contents.OfType<ZombieBrain>().FirstOrDefault();
+                            --zomb.hp;
+                        }
+                        if (landSlot[nextValue].cell_Contents.Contains(zombies[0]))
+                        {
+                            ZombieBrain zomb = landSlot[nextValue].cell_Contents.OfType<ZombieBrain>().FirstOrDefault();
+                             --zomb.hp;
+                        }
                         break;
                     }
 
@@ -679,23 +694,31 @@ namespace PVZ_console
                     }
                 }
 
-                if (cell.cell_Contents.Contains(zombies[0]) && gameTimer % zombies[0].speed == 0)
+                if (cell.cell_Contents.Contains(zombies[0]))
                 {
-                    int index = landSlot.FindIndex(a => a == cell);
-                    Regex rgx = new Regex(@"\D+");
-                    string indexRow = rgx.Match(landSlot[index].cell_ID).Value;
-                    int nextValue = index - 1;
-                    string nextValueRow = null;
-                    if (nextValue > 0)
+                    if(gameTimer % zombies[0].speed == 0)
                     {
-                        nextValueRow = rgx.Match(landSlot[nextValue].cell_ID).Value;
+                        int index = landSlot.FindIndex(a => a == cell);
+                        Regex rgx = new Regex(@"\D+");
+                        string indexRow = rgx.Match(landSlot[index].cell_ID).Value;
+                        int nextValue = index - 1;
+                        string nextValueRow = null;
+                        if (nextValue > 0)
+                        {
+                            nextValueRow = rgx.Match(landSlot[nextValue].cell_ID).Value;
+                        }
+
+                        landSlot[index].cell_Contents.Remove(zombies[0]);
+
+                        if (nextValueRow == indexRow && nextValue <= landSlot.Count)
+                        {
+                            landSlot[nextValue].cell_Contents.Add(zombies[0]);
+                        }
                     }
 
-                    landSlot[index].cell_Contents.Remove(zombies[0]);
-
-                    if (nextValueRow == indexRow && nextValue <= landSlot.Count)
+                    if (zombies[0].hp <= 0)
                     {
-                        landSlot[nextValue].cell_Contents.Add(zombies[0]);
+                        cell.cell_Contents.Remove(zombies[0]);
                     }
                 }
             }
@@ -745,13 +768,15 @@ namespace PVZ_console
         public string symbol;
         public string color;
         public double speed;
-        public ZombieBrain(string name, string desc, string zombSymbol, string zombColor, double zombieSpeed)
+        public int hp;
+        public ZombieBrain(string name, string desc, string zombSymbol, string zombColor, double zombieSpeed, int health)
         {
             Zombie_Name = name;
             Zombie_Description = desc;
             symbol = zombSymbol;
             color = zombColor;
             speed = zombieSpeed;
+            hp = health;
         }
     }
 
