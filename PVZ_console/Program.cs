@@ -630,7 +630,21 @@ namespace PVZ_console
                 {
                     if ((gameTimer - newCellTimers[cell]) % plants[0].Shooting_Speed == 0)
                     {
-                        cell.cell_Contents.Add(projectiles[1]);
+                        Regex rgx = new Regex(@"\D");
+                        string cellLetter = rgx.Match(cell.cell_ID).Value;
+                        for(int i = landSlot.IndexOf(cell); i < landSlot.Count; i++)
+                        {
+                            if (landSlot[i].cell_ID.Contains(cellLetter))
+                            {
+                                foreach(ZombieBrain zomb in zombies)
+                                {
+                                    if (landSlot[i].cell_Contents.Contains(zomb))
+                                    {
+                                        cell.cell_Contents.Add(projectiles[1]);
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -646,6 +660,16 @@ namespace PVZ_console
                     {
                         nextValueRow = rgx.Match(landSlot[nextValue].cell_ID).Value;
                     }
+
+                    if (landSlot[index].cell_Contents.Contains(zombies[0]) || landSlot[nextValue].cell_Contents.Contains(zombies[0]))
+                    {
+                        landSlot[index].cell_Contents.Remove(zombies[0]);
+                        landSlot[index].cell_Contents.Remove(projectiles[1]);
+                        landSlot[nextValue].cell_Contents.Remove(zombies[0]);
+                        landSlot[nextValue].cell_Contents.Remove(projectiles[1]);
+                        break;
+                    }
+
                     landSlot[index].cell_Contents.Remove(projectiles[1]);
 
                     if(nextValueRow == indexRow && nextValue <= landSlot.Count)
@@ -666,6 +690,7 @@ namespace PVZ_console
                     {
                         nextValueRow = rgx.Match(landSlot[nextValue].cell_ID).Value;
                     }
+
                     landSlot[index].cell_Contents.Remove(zombies[0]);
 
                     if (nextValueRow == indexRow && nextValue <= landSlot.Count)
