@@ -163,7 +163,7 @@ namespace PVZ_console
                         {
                             if (zomb.Zombie_Name.Trim().Normalize() == substrings[2].Trim().Normalize())
                             {
-                                zombToAdd = zomb;
+                                zombToAdd = (ZombieBrain)zomb.Clone();
                             }
                         }
                         zombGen.Add(new ZombieGenerationInfo(Convert.ToInt16(substrings[1]), zombToAdd, substrings[3], Convert.ToDouble(substrings[4]), Convert.ToBoolean(substrings[5]), Convert.ToInt16(substrings[6])));
@@ -250,7 +250,7 @@ namespace PVZ_console
                     }
                     else
                     {
-                        object displayedChar = (cell_list.Find(Cell => Cell.cell_ID == curId).cell_Contents.LastOrDefault());
+                        var displayedChar = (cell_list.Find(Cell => Cell.cell_ID == curId).cell_Contents.LastOrDefault());
 
                         foreach (PlantBrain plant in plants)
                         {
@@ -277,7 +277,6 @@ namespace PVZ_console
                                 Console.Write(zomb.symbol);
                                 Console.ResetColor();
                                 Console.Write("║");
-
                                 break;
                             }
                         }
@@ -662,25 +661,37 @@ namespace PVZ_console
                     Regex rgx = new Regex(@"\D+");
                     string indexRow = rgx.Match(landSlot[index].cell_ID).Value;
                     int nextValue = index + 1;
+
+                    if (nextValue >= landSlot.Count)
+                        nextValue = landSlot.Count - 1;
+                    
                     string nextValueRow = null;
                     if(nextValue < landSlot.Count)
                     {
                         nextValueRow = rgx.Match(landSlot[nextValue].cell_ID).Value;
                     }
 
-                    if (landSlot[index].cell_Contents.Contains(zombies[0]) || landSlot[nextValue].cell_Contents.Contains(zombies[0]))
+                    if (landSlot[index].cell_Contents.Contains(zombies[0]))
                     {
-                        landSlot[index].cell_Contents.Remove(projectiles[1]);
-                        landSlot[nextValue].cell_Contents.Remove(projectiles[1]);
-                        if (landSlot[index].cell_Contents.Contains(zombies[0]))
+                        var targetZombie = landSlot[index].cell_Contents.FirstOrDefault(z => z is ZombieBrain);
+
+                        if(targetZombie != null)
                         {
-                            ZombieBrain zomb = landSlot[index].cell_Contents.OfType<ZombieBrain>().FirstOrDefault();
-                            --zomb.hp;
+                            ((ZombieBrain)targetZombie).hp--;
+                            landSlot[index].cell_Contents.Remove(projectiles[1]);
+                            landSlot[nextValue].cell_Contents.Remove(projectiles[1]);
                         }
-                        if (landSlot[nextValue].cell_Contents.Contains(zombies[0]))
+                        break;
+                    }
+                    if (landSlot[nextValue].cell_Contents.Contains(zombies[0]))
+                    {
+                        var targetZombie = landSlot[nextValue].cell_Contents.FirstOrDefault(z => z is ZombieBrain);
+
+                        if (targetZombie != null)
                         {
-                            ZombieBrain zomb = landSlot[nextValue].cell_Contents.OfType<ZombieBrain>().FirstOrDefault();
-                             --zomb.hp;
+                            ((ZombieBrain)targetZombie).hp--;
+                            landSlot[index].cell_Contents.Remove(projectiles[1]);
+                            landSlot[nextValue].cell_Contents.Remove(projectiles[1]);
                         }
                         break;
                     }
@@ -731,7 +742,8 @@ namespace PVZ_console
                     {
                         if (cell.cell_ID.Contains(enemyGen.row) && cell.cell_ID.Contains("10"))
                         {
-                            cell.cell_Contents.Add(enemyGen.zombieToGenerate);
+                            ZombieBrain zombToAdd = enemyGen.zombieToGenerate;
+                            cell.cell_Contents.Add((ZombieBrain)zombToAdd);
                         }
                     }
                 }
@@ -740,7 +752,7 @@ namespace PVZ_console
     }
 
     //Creating a plant + executing plant logic -- Unfinished, in fact some may say not even started lol
-    internal class PlantBrain
+    internal class PlantBrain : ICloneable
     {
         public string Plant_Name;
         public string Plant_Description;
@@ -758,10 +770,22 @@ namespace PVZ_console
             symbol = plantSymbol;
             color = plantColor;
         }
+
+        public object Clone()
+        {
+            PlantBrain clone = new PlantBrain(null, null, 0, 0, null, null);
+            clone.Plant_Name = this.Plant_Name;
+            clone.Plant_Description = this.Plant_Description;
+            clone.Shooting_Speed = this.Shooting_Speed;
+            clone.Sun_cost = this.Sun_cost;
+            clone.symbol = this.symbol;
+            clone.color = this.color;
+            return clone;
+        }
     }
 
     //Creating a zombie + executing plant logic -- Unfinished, in fact some may say not even started lol
-    internal class ZombieBrain
+    internal class ZombieBrain : ICloneable
     {
         public string Zombie_Name;
         public string Zombie_Description;
@@ -777,6 +801,18 @@ namespace PVZ_console
             color = zombColor;
             speed = zombieSpeed;
             hp = health;
+        }
+
+        public object Clone()
+        {
+            ZombieBrain clone = new ZombieBrain(null, null, null, null, 0, 0);
+            clone.Zombie_Name = this.Zombie_Name;
+            clone.Zombie_Description = this.Zombie_Description;
+            clone.symbol= this.symbol;
+            clone.color = this.color;
+            clone.speed = this.speed;
+            clone.hp = this.hp;
+            return clone;
         }
     }
 

@@ -22,8 +22,12 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 3,
           "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
             {
               "$type": "Document",
               "DocumentIndex": 2,
@@ -47,8 +51,7 @@
               "RelativeToolTip": "Entities.txt",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAzAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
-              "WhenOpened": "2024-11-11T16:59:52.557Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-11-11T16:59:52.557Z"
             },
             {
               "$type": "Document",
@@ -58,7 +61,7 @@
               "RelativeDocumentMoniker": "Program.cs",
               "ToolTip": "C:\\Users\\2477548\\Documents\\GitHub\\PvZ_c-sharp\\PVZ_console\\Program.cs",
               "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAAI0CAAAAAAAAAAD4v6UAAAAsAAAAAAAAAA==",
+              "ViewState": "AgIAALwCAAAAAAAAAADwv+kCAAA8AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-11-01T13:09:09.087Z",
               "EditorCaption": ""
