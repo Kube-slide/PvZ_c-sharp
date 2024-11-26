@@ -1,14 +1,18 @@
 ﻿---------------===============         Plants          ===============---------------
 
-p_Peashooter | Shoots 1 pea every 3 seconds | 0 | 3 | p | Green
-p_Sunflower | Spawns 1 sun every 5 seconds | 2 | 5 | s | Yellow
-p_WallNut | Eats upto 5 zombie attacks | 2 | 0 | w | DarkRed
+format : {name} \ {description} \ {sun cost} \ {shoot speed} \ {symbol} \ {Color} \ {health}
+
+p_Peashooter | Shoots 1 pea every 3 seconds | 0 | 3 | p | Green | 4
+p_Sunflower | Spawns 1 sun every 5 seconds | 2 | 5 | s | Yellow | 2
+p_WallNut | Eats upto 5 zombie attacks | 2 | 0 | w | DarkRed | 8
 
 ---------------===============        Zombies          ===============---------------
 
-z_GenericZombie  | Moves 1 tile every 2 second and attacks every 2.5 second | z | DarkGreen | 5 | 5
-z_PoleVolter | Moves 1 tile every 1.5 second and attacks every 2.5 second | v | Blue | 4 | 5
-z_MiniZomb | Moves 1 tiles every 2 second and attacks every 1.75 second | m | Gray | 0.25 | 5
+format : {name} \ {description} \ {symbol} \ {Color} \ {Move Speed} \ {Health} \ {Attack Speed}
+
+z_GenericZombie  | Moves 1 tile every 2 second and attacks every 2.5 second | z | DarkGreen | 5 | 5 | 2
+z_PoleVolter | Moves 1 tile every 1.5 second and attacks every 2.5 second | v | Blue | 4 | 5 | 2
+z_MiniZomb | Moves 1 tiles every 2 second and attacks every 1.75 second | m | Gray | 0.25 | 5 | 2
 
 ---------------===============       Projectiles          ===============---------------
 

@@ -14,3 +14,4 @@ zgen_ | 1 | z_PoleVolter | C | 25 | false | 0
 zgen_ | 1 | z_GenericZombie | G | 12 | false | 0
 zgen_ | 1 | z_MiniZomb | D | 17 | false | 0
 zgen_ | 1 | z_GenericZombie | C | 20 | false | 0
+zgen_ | 1 | z_GenericZombie | C | 2 | false | 0

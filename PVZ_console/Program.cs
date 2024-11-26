@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Transactions;
@@ -13,7 +14,7 @@ namespace PVZ_console
         static string notesFilePath = @"..\..\..\Entities.txt";
         static string zombGeneration = @"..\..\..\ZombieGeneration.txt";
         static List<PlantBrain> plants = new List<PlantBrain>();
-        static List<ZombieBrain> zombies = new List<ZombieBrain>();
+        public static List<ZombieBrain> zombies = new List<ZombieBrain>();
         static List<Projectile> projectiles = new List<Projectile>();
 
         //Cell type lists
@@ -133,13 +134,13 @@ namespace PVZ_console
                     {
                         //Break string into pieces --> store the info in an array and create a plant from given data
                         string[] subStrings = line.Split(" | ", StringSplitOptions.RemoveEmptyEntries);
-                        plants.Add(new PlantBrain(subStrings[0], subStrings[1], Convert.ToInt32(subStrings[2]), Convert.ToInt32(subStrings[3]), subStrings[4], subStrings[5]));
+                        plants.Add(new PlantBrain(subStrings[0], subStrings[1], Convert.ToInt32(subStrings[2]), Convert.ToInt32(subStrings[3]), subStrings[4], subStrings[5], Convert.ToInt16(subStrings[6])));
                     }
                     else if (line.StartsWith("z_"))
                     {
                         //Break string into pieces --> store the info in an array and create a zombie from given data
                         string[] subStrings = line.Split(" | ", StringSplitOptions.RemoveEmptyEntries);
-                        zombies.Add(new ZombieBrain(subStrings[0], subStrings[1], subStrings[2], subStrings[3], Convert.ToDouble(subStrings[4]), Convert.ToInt16(subStrings[5])));
+                        zombies.Add(new ZombieBrain(subStrings[0], subStrings[1], subStrings[2], subStrings[3], Convert.ToDouble(subStrings[4]), Convert.ToInt16(subStrings[5]), Convert.ToInt16(subStrings[6])));
                     }
                     else if (line.StartsWith("s_"))
                     {
@@ -252,48 +253,35 @@ namespace PVZ_console
                     {
                         var displayedChar = (cell_list.Find(Cell => Cell.cell_ID == curId).cell_Contents.LastOrDefault());
 
-                        foreach (PlantBrain plant in plants)
+                        if(displayedChar.GetType().Name == "PlantBrain")
                         {
-                            if (displayedChar == plant)
-                            {
-                                Console.ResetColor();
-                                Console.Write("║");
-                                Console.ForegroundColor = SetConsoleColor(plant.color);
-                                Console.Write(plant.symbol);
-                                Console.ResetColor();
-                                Console.Write("║");
-
-                                break;
-                            }
+                            Console.ResetColor();
+                            Console.Write("║");
+                            Console.ForegroundColor = SetConsoleColor(((PlantBrain)displayedChar).color);
+                            Console.Write(((PlantBrain)displayedChar).symbol);
+                            Console.ResetColor();
+                            Console.Write("║");
                         }
 
-                        foreach (ZombieBrain zomb in zombies)
+
+                        if(displayedChar.GetType().Name == "ZombieBrain")
                         {
-                            if (displayedChar == zomb)
-                            {
-                                Console.ResetColor();
-                                Console.Write("║");
-                                Console.ForegroundColor = SetConsoleColor(zomb.color);
-                                Console.Write(zomb.symbol);
-                                Console.ResetColor();
-                                Console.Write("║");
-                                break;
-                            }
+                            Console.ResetColor();
+                            Console.Write("║");
+                            Console.ForegroundColor = SetConsoleColor(((ZombieBrain)displayedChar).color);
+                            Console.Write(((ZombieBrain)displayedChar).symbol);
+                            Console.ResetColor();
+                            Console.Write("║");
                         }
 
-                        foreach (Projectile proj in projectiles)
+                        if(displayedChar.GetType().Name == "Projectile")
                         {
-                            if (displayedChar == proj)
-                            {
-                                Console.ResetColor();
-                                Console.Write("║");
-                                Console.ForegroundColor= SetConsoleColor(proj.color);
-                                Console.Write(proj.symbol);
-                                Console.ResetColor();
-                                Console.Write("║");
-
-                                break;
-                            }
+                            Console.ResetColor();
+                            Console.Write("║");
+                            Console.ForegroundColor = SetConsoleColor(((Projectile)displayedChar).color);
+                            Console.Write(((Projectile)displayedChar).symbol);
+                            Console.ResetColor();
+                            Console.Write("║");
                         }
 
                         if (displayedChar == "!")
@@ -592,7 +580,7 @@ namespace PVZ_console
             {
                 if (mouseQueue != null && cellChecked.cell_Contents.Count == 1)
                 {
-                    cellChecked.cell_Contents.Add(mouseQueue);
+                    cellChecked.cell_Contents.Add(((PlantBrain)mouseQueue).Clone());
                     mouseQueue = null;
 
                     newCellTimers.Add(cellChecked, gameTimer);
@@ -642,7 +630,7 @@ namespace PVZ_console
                             {
                                 foreach(ZombieBrain zomb in zombies)
                                 {
-                                    if (landSlot[i].cell_Contents.Contains(zomb) && !alreadyShot)
+                                    if (landSlot[i].cell_Contents.OfType<ZombieBrain>().Any() && !alreadyShot)
                                     {
                                         cell.cell_Contents.Add(projectiles[1]);
                                         alreadyShot = true;
@@ -671,9 +659,9 @@ namespace PVZ_console
                         nextValueRow = rgx.Match(landSlot[nextValue].cell_ID).Value;
                     }
 
-                    if (landSlot[index].cell_Contents.Contains(zombies[0]))
+                    if (landSlot[index].cell_Contents.OfType<ZombieBrain>().Any())
                     {
-                        var targetZombie = landSlot[index].cell_Contents.FirstOrDefault(z => z is ZombieBrain);
+                        var targetZombie = landSlot[index].cell_Contents.LastOrDefault(z => z is ZombieBrain);
 
                         if(targetZombie != null)
                         {
@@ -683,9 +671,9 @@ namespace PVZ_console
                         }
                         break;
                     }
-                    if (landSlot[nextValue].cell_Contents.Contains(zombies[0]))
+                    if (landSlot[nextValue].cell_Contents.OfType<ZombieBrain>().Any())
                     {
-                        var targetZombie = landSlot[nextValue].cell_Contents.FirstOrDefault(z => z is ZombieBrain);
+                        var targetZombie = landSlot[nextValue].cell_Contents.LastOrDefault(z => z is ZombieBrain);
 
                         if (targetZombie != null)
                         {
@@ -705,31 +693,84 @@ namespace PVZ_console
                     }
                 }
 
-                if (cell.cell_Contents.Contains(zombies[0]))
+                if (cell.cell_Contents.OfType<ZombieBrain>().ToList().Count > 0)
                 {
-                    if(gameTimer % zombies[0].speed == 0)
+                    List<ZombieBrain> zombiesInCell = new List<ZombieBrain>();
+                    zombiesInCell = cell.cell_Contents.OfType<ZombieBrain>().ToList();
+
+                    foreach(ZombieBrain zombs in zombiesInCell)
                     {
-                        int index = landSlot.FindIndex(a => a == cell);
-                        Regex rgx = new Regex(@"\D+");
-                        string indexRow = rgx.Match(landSlot[index].cell_ID).Value;
-                        int nextValue = index - 1;
-                        string nextValueRow = null;
-                        if (nextValue > 0)
+                        if (zombs.symbol == zombies[0].symbol)
                         {
-                            nextValueRow = rgx.Match(landSlot[nextValue].cell_ID).Value;
+                            if (gameTimer % zombs.speed == 0)
+                            {
+                                int index = landSlot.FindIndex(a => a == cell);
+                                Regex rgx = new Regex(@"\D+");
+                                string indexRow = rgx.Match(landSlot[index].cell_ID).Value;
+                                int nextValue = index - 1;
+                                string nextValueRow = null;
+                                if (nextValue > 0)
+                                {
+                                    nextValueRow = rgx.Match(landSlot[nextValue].cell_ID).Value;
+                                }
+
+                                landSlot[index].cell_Contents.Remove(zombs);
+
+                                if (nextValueRow == indexRow && nextValue <= landSlot.Count)
+                                {
+                                    landSlot[nextValue].cell_Contents.Add(zombs);
+                                }
+                            }
+
+                            if (zombs.hp <= 0)
+                            {
+                                cell.cell_Contents.Remove(zombs);
+                            }
                         }
-
-                        landSlot[index].cell_Contents.Remove(zombies[0]);
-
-                        if (nextValueRow == indexRow && nextValue <= landSlot.Count)
+                        if (zombs.symbol == zombies[1].symbol)
                         {
-                            landSlot[nextValue].cell_Contents.Add(zombies[0]);
-                        }
-                    }
+                            if (gameTimer % zombs.speed == 0)
+                            {
+                                int index = landSlot.FindIndex(a => a == cell);
+                                Regex rgx = new Regex(@"\D+");
+                                string indexRow = rgx.Match(landSlot[index].cell_ID).Value;
+                                int nextValue = index - 1;
+                                string nextValueRow = null;
+                                if (nextValue > 0)
+                                {
+                                    nextValueRow = rgx.Match(landSlot[nextValue].cell_ID).Value;
+                                }
 
-                    if (zombies[0].hp <= 0)
-                    {
-                        cell.cell_Contents.Remove(zombies[0]);
+                                landSlot[index].cell_Contents.Remove(zombs);
+
+                                if (nextValueRow == indexRow && nextValue <= landSlot.Count)
+                                {
+                                    landSlot[nextValue].cell_Contents.Add(zombs);
+                                }
+                            }
+                        }
+                        if (zombs.symbol == zombies[2].symbol)
+                        {
+                            if (gameTimer % zombs.speed == 0)
+                            {
+                                int index = landSlot.FindIndex(a => a == cell);
+                                Regex rgx = new Regex(@"\D+");
+                                string indexRow = rgx.Match(landSlot[index].cell_ID).Value;
+                                int nextValue = index - 1;
+                                string nextValueRow = null;
+                                if (nextValue > 0)
+                                {
+                                    nextValueRow = rgx.Match(landSlot[nextValue].cell_ID).Value;
+                                }
+
+                                landSlot[index].cell_Contents.Remove(zombs);
+
+                                if (nextValueRow == indexRow && nextValue <= landSlot.Count)
+                                {
+                                    landSlot[nextValue].cell_Contents.Add(zombs);
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -751,7 +792,6 @@ namespace PVZ_console
         }
     }
 
-    //Creating a plant + executing plant logic -- Unfinished, in fact some may say not even started lol
     internal class PlantBrain : ICloneable
     {
         public string Plant_Name;
@@ -760,8 +800,9 @@ namespace PVZ_console
         public int Sun_cost;
         public string symbol;
         public string color;
+        public int hp;
 
-        public PlantBrain(string name, string desc, int sunCost, int shootSpeed, string plantSymbol, string plantColor)
+        public PlantBrain(string name, string desc, int sunCost, int shootSpeed, string plantSymbol, string plantColor, int health)
         {
             Plant_Name = name;
             Plant_Description = desc;
@@ -769,22 +810,23 @@ namespace PVZ_console
             Shooting_Speed = shootSpeed;
             symbol = plantSymbol;
             color = plantColor;
+            hp = health;
         }
 
         public object Clone()
         {
-            PlantBrain clone = new PlantBrain(null, null, 0, 0, null, null);
+            PlantBrain clone = new PlantBrain(null, null, 0, 0, null, null, 0);
             clone.Plant_Name = this.Plant_Name;
             clone.Plant_Description = this.Plant_Description;
             clone.Shooting_Speed = this.Shooting_Speed;
             clone.Sun_cost = this.Sun_cost;
             clone.symbol = this.symbol;
             clone.color = this.color;
+            clone.hp = this.hp;
             return clone;
         }
     }
 
-    //Creating a zombie + executing plant logic -- Unfinished, in fact some may say not even started lol
     internal class ZombieBrain : ICloneable
     {
         public string Zombie_Name;
@@ -793,7 +835,8 @@ namespace PVZ_console
         public string color;
         public double speed;
         public int hp;
-        public ZombieBrain(string name, string desc, string zombSymbol, string zombColor, double zombieSpeed, int health)
+        public double attackSpeed;
+        public ZombieBrain(string name, string desc, string zombSymbol, string zombColor, double zombieSpeed, int health, double atkSpd)
         {
             Zombie_Name = name;
             Zombie_Description = desc;
@@ -801,17 +844,19 @@ namespace PVZ_console
             color = zombColor;
             speed = zombieSpeed;
             hp = health;
+            attackSpeed = atkSpd;
         }
 
         public object Clone()
         {
-            ZombieBrain clone = new ZombieBrain(null, null, null, null, 0, 0);
+            ZombieBrain clone = new ZombieBrain(null, null, null, null, 0, 0, 0);
             clone.Zombie_Name = this.Zombie_Name;
             clone.Zombie_Description = this.Zombie_Description;
             clone.symbol= this.symbol;
             clone.color = this.color;
             clone.speed = this.speed;
             clone.hp = this.hp;
+            clone.attackSpeed = this.attackSpeed;
             return clone;
         }
     }
