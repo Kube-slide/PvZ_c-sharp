@@ -12,6 +12,6 @@ yet to implement. idk what special events could happen ngl
 zgen_ | 1 | z_GenericZombie | E | 10 | false | 0
 zgen_ | 1 | z_PoleVolter | C | 25 | false | 0
 zgen_ | 1 | z_GenericZombie | G | 12 | false | 0
-zgen_ | 1 | z_Imp | D | 17 | false | 0
+zgen_ | 1 | z_Imp | D | 2 | false | 0
 zgen_ | 1 | z_GenericZombie | C | 20 | false | 0
-zgen_ | 1 | z_GenericZombie | C | 2 | false | 0
+zgen_ | 1 | z_GenericZombie | C | 15 | false | 0

@@ -350,7 +350,16 @@ namespace PVZ_console
         //Draw pause menu
         static void DPM()
         {
+            (int, int) consoleSize = (Console.WindowWidth, Console.WindowHeight);
 
+            string[] message = {"---PAUSED---", "", "Press ENTER to resume game", "", "Press ESCAPE to exit to desktop"};
+
+            for (int i = 0; i < message.Length; i++)
+            {
+                Console.Write("\n");
+                Console.CursorLeft = (consoleSize.Item1 / 2) - (message[i].Length / 2);
+                Console.Write(message[i]);
+            }
         }
 
         //Draw instructions menu
@@ -378,7 +387,16 @@ namespace PVZ_console
         //Draw game over
         static void DGO()
         {
+            (int, int) consoleSize = (Console.WindowWidth, Console.WindowHeight);
 
+            string[] message = { "---GAME OVER---", "The zombies ate your brains...", "", "FINAL SCORE : LEVEL X", "ZOMBIES DEFEATED : X ZOMBIES", "", "Press ENTER to return to main menu and try again", "", "Press ESCAPE to exit to desktop" };
+
+            for (int i = 0; i < message.Length; i++)
+            {
+                Console.Write("\n");
+                Console.CursorLeft = (consoleSize.Item1 / 2) - (message[i].Length / 2);
+                Console.Write(message[i]);
+            }
         }
 
         //Draw quit game
@@ -621,15 +639,32 @@ namespace PVZ_console
             {
                 case "In-game":
                     //Check for input WITHOUT blocking script. W/o console.KeyAvailable, the rest of the code would hang :\
-                    if (Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.Spacebar && isInWindow)
+                    if (Console.KeyAvailable && isInWindow)
                     {
-                        for (int i = 0; i < cell_list.Count; i++)
+                        switch (Console.ReadKey().Key)
                         {
-                            if (IsInCell(convertedCharLength, cell_list[i], MousePos))
-                            {
-                                DoCellAction(cell_list[i]);
-                            }
+                            case ConsoleKey.Spacebar:
+                                for (int i = 0; i < cell_list.Count; i++)
+                                {
+                                    if (IsInCell(convertedCharLength, cell_list[i], MousePos))
+                                    {
+                                        DoCellAction(cell_list[i]);
+                                        break;
+                                    }
+                                }
+                                break;
+                            case ConsoleKey.Escape:
+                                prevState = curState;
+                                curState = "Paused";
+                                break;
+
                         }
+                    }
+
+                    if (!isInWindow)
+                    {
+                        prevState = curState;
+                        curState = "Paused";
                     }
 
                     break;
@@ -679,7 +714,21 @@ namespace PVZ_console
                     }
                     break;
 
-                case "Pause":
+                case "Paused":
+                    if (Console.KeyAvailable)
+                    {
+                        switch (Console.ReadKey().Key)
+                        {
+                            case ConsoleKey.Enter:
+                                prevState = curState;
+                                curState = "In-game";
+                                break;
+                            case ConsoleKey.Escape:
+                                prevState = curState;
+                                curState = "Quit";
+                                break;
+                        }
+                    }
                     break;
 
                 case "Credits":
@@ -691,6 +740,7 @@ namespace PVZ_console
                         }
                     }
                     break;
+                
                 case "Almanac":
                     if (Console.KeyAvailable)
                     {
@@ -701,11 +751,30 @@ namespace PVZ_console
                     }
                     break;
 
+                case "Game over":
+                    if (Console.KeyAvailable)
+                    {
+                        switch (Console.ReadKey().Key)
+                        {
+                            case ConsoleKey.Enter:
+                                prevState = curState;
+                                curState = "Menu";
+                                break;
+                            case ConsoleKey.Escape:
+                                prevState = curState;
+                                curState = "Quit";
+                                break;
+                        }
+                    }
+                    break;
+
             }
 
             if (!isInWindow)
             {
-                Console.WriteLine("Outside game area! Return back to keep playing!");
+                string message = "Outside game area! Return back to keep playing!";
+                Console.SetCursorPosition(Console.WindowWidth / 2 - (message.Length / 2), Console.WindowTop + Console.WindowHeight - 5);
+                Console.WriteLine(message);
             }
         }
 
@@ -918,6 +987,13 @@ namespace PVZ_console
                         string indexRow = rgx.Match(landSlot[index].cell_ID).Value;
                         int nextValue = index - 1;
                         string nextValueRow = null;
+
+                        if (nextValue == 9)
+                        {
+                            prevState = curState;
+                            curState = "Game over";
+                            return;
+                        }
 
                         if (nextValue > 0)
                         {
