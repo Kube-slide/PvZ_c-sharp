@@ -1,5 +1,8 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
+using System.Dynamic;
 using System.Runtime.InteropServices;
+using System.Security;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 namespace PVZ_console
@@ -36,6 +39,7 @@ namespace PVZ_console
         //Conditional checks for loading
         static bool generatedCells = false;
         static bool preload = false;
+        static int selectedOption = 0;
 
         //In-Game timer for storing game process time
         static double gameTimer;
@@ -229,15 +233,29 @@ namespace PVZ_console
         {
             (int, int) windowSize = (Console.WindowWidth, Console.WindowHeight);
 
-            Console.SetCursorPosition((windowSize.Item1 / 2), (windowSize.Item2 / 4));
+            string titleCard = "---=== Plants vs. Zombies : Console app edition ===---";
 
-            string[] gameOptions = { "-----Vegetation vs. Ghouls-----", "", "1. Play game", "2. Instructions", "3. Credits", "4. View Almanac", "5. Exit to desktop" };
+            Console.SetCursorPosition((windowSize.Item1 / 2) - (titleCard.Length / 2), (windowSize.Item2 / 4));
+
+            Console.WriteLine(titleCard + "\n");
+
+            string[] gameOptions = {"1. Play game", "2. Instructions", "3. Credits", "4. View Almanac", "5. Exit to desktop", "", "Write your choice # or use up arrow and down arrow to navigate", "Press enter to select an option"};
 
             for (int i = 0; i < gameOptions.Length; i++)
             {
                 Console.Write("\n");
                 Console.CursorLeft = (windowSize.Item1 / 2) - (gameOptions[i].Length / 2);
-                Console.Write(gameOptions[i]);
+                if(i == selectedOption)
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write(gameOptions[i] + "   <---");
+                    Console.ResetColor();
+                }
+                else
+                {
+                    Console.Write(gameOptions[i]);
+                }
+                
             }
 
             Console.SetCursorPosition((Console.WindowWidth / 2), Console.WindowTop + Console.WindowHeight - 10);
@@ -695,6 +713,51 @@ namespace PVZ_console
                                 prevState = curState;
                                 curState = gameStates[5];
                                 break;
+                            case ConsoleKey.DownArrow:
+                                if(selectedOption + 1 > 4)
+                                {
+                                    selectedOption = 0;
+                                }
+                                else
+                                {
+                                    selectedOption++;
+                                }
+                                break;
+                            case ConsoleKey.UpArrow:
+                                if (selectedOption - 1 < 0)
+                                {
+                                    selectedOption = 4;
+                                }
+                                else
+                                {
+                                    selectedOption--;
+                                }
+                                break;
+                            case ConsoleKey.Enter:
+                                switch (selectedOption)
+                                {
+                                    case 0:
+                                        prevState = curState;
+                                        curState = gameStates[1];
+                                        break;
+                                    case 1:
+                                        prevState = curState;
+                                        curState = gameStates[3];
+                                        break;
+                                    case 2:
+                                        prevState = curState;
+                                        curState = gameStates[4];
+                                        break;
+                                    case 3:
+                                        prevState = curState;
+                                        curState = gameStates[7];
+                                        break;
+                                    case 4:
+                                        prevState = curState;
+                                        curState = gameStates[5];
+                                        break;
+                                }
+                                break;
                             default:
                                 break;
                         }
@@ -843,7 +906,7 @@ namespace PVZ_console
             }
             else if (landSlot.Contains(cellChecked))
             {
-                if (mouseQueue != null && cellChecked.cell_Contents.Count == 1)
+                if (mouseQueue != null && cellChecked.cell_Contents.OfType<PlantBrain>().ToList().Count == 0)
                 {
                     cellChecked.cell_Contents.Add(((PlantBrain)mouseQueue).Clone());
                     mouseQueue = null;
@@ -920,9 +983,28 @@ namespace PVZ_console
                         }
                     }
 
+                    //Potato mine ; Not armed yet
+                    if(plantInCell.symbol == plants[3].symbol)
+                    {
+                        if((gameTimer - newCellTimers[cell]) % plants[3].Shooting_Speed == 0)
+                        {
+                            plantInCell.symbol = "O";
+                        }
+                    }
+
+                    //Potato mine ; Armed status
+                    if(plantInCell.symbol == "O")
+                    {
+                        if (cell.cell_Contents.OfType<ZombieBrain>().Any())
+                        {
+                            List<ZombieBrain> zombiesInCell = cell.cell_Contents.OfType<ZombieBrain>().ToList();
+                            cell.cell_Contents.Remove(zombiesInCell[0]);
+                            cell.cell_Contents.Remove(cell.cell_Contents.OfType<PlantBrain>().ToList()[0]);
+                        }
+                    }
+
                 }
 
-                //Somehow only move every Projectile ONCE!
                 if (cell.cell_Contents.Contains(projectiles[1]) && cell != lastMovedProj)
                 {
                     int index = landSlot.FindIndex(a => a == cell);
@@ -975,8 +1057,7 @@ namespace PVZ_console
 
                 if (cell.cell_Contents.OfType<ZombieBrain>().ToList().Count > 0)
                 {
-                    List<ZombieBrain> zombiesInCell = new List<ZombieBrain>();
-                    zombiesInCell = cell.cell_Contents.OfType<ZombieBrain>().ToList();
+                    List<ZombieBrain> zombiesInCell = cell.cell_Contents.OfType<ZombieBrain>().ToList();
 
                     foreach (ZombieBrain zombs in zombiesInCell)
                     {
@@ -988,10 +1069,11 @@ namespace PVZ_console
                         int nextValue = index - 1;
                         string nextValueRow = null;
 
-                        if (nextValue == 9)
+                        if (nextValue > index)
                         {
                             prevState = curState;
                             curState = "Game over";
+                            ResetGame();
                             return;
                         }
 
@@ -1006,15 +1088,29 @@ namespace PVZ_console
                         }
 
                         bool nextSlotHasPlant = landSlot[nextValue].cell_Contents.OfType<PlantBrain>().ToList().Count > 0;
+                        bool currentSlotHasPlant = landSlot[index].cell_Contents.OfType<PlantBrain>().ToList().Count > 0;
 
-                        if (zombs.symbol == zombies[0].symbol)
+                        if (nextSlotHasPlant)
+                        {
+                            if (landSlot[nextValue].cell_Contents.OfType<PlantBrain>().ToList()[0].symbol == "O")
+                            {
+                                nextSlotHasPlant = false;
+                            }
+                        }
+
+                        //Regular zombies ; No special stuff going on
+                        if (zombs.symbol == zombies[0].symbol || zombs.symbol == zombies[2].symbol || zombs.symbol == zombies[3].symbol || zombs.symbol == zombies[4].symbol)
                         {
                             if (nextSlotHasPlant && gameTimer % zombs.attackSpeed == 0)
                             {
                                 --landSlot[nextValue].cell_Contents.OfType<PlantBrain>().ToList()[0].hp;
                             }
+                            if (currentSlotHasPlant && gameTimer % zombs.attackSpeed == 0)
+                            {
+                                --landSlot[index].cell_Contents.OfType<PlantBrain>().ToList()[0].hp;
+                            }
 
-                            if (gameTimer % zombs.speed == 0 && !nextSlotHasPlant)
+                            if (gameTimer % zombs.speed == 0 && !nextSlotHasPlant && !currentSlotHasPlant)
                             {
                                 landSlot[index].cell_Contents.Remove(zombs);
 
@@ -1027,28 +1123,31 @@ namespace PVZ_console
 
                         if (zombs.symbol == zombies[1].symbol)
                         {
-                            if (gameTimer % zombs.speed == 0)
+                            if ((nextSlotHasPlant) && gameTimer % zombs.attackSpeed == 0)
                             {
-
-                                landSlot[index].cell_Contents.Remove(zombs);
-
-                                if (nextValueRow == indexRow && nextValue <= landSlot.Count)
-                                {
-                                    landSlot[nextValue].cell_Contents.Add(zombs);
-                                }
+                                    --landSlot[nextValue].cell_Contents.OfType<PlantBrain>().ToList()[0].hp;
                             }
-                        }
+                            if ((currentSlotHasPlant) && gameTimer % zombs.attackSpeed == 0)
+                            {
+                                --landSlot[index].cell_Contents.OfType<PlantBrain>().ToList()[0].hp;
+                            }
 
-                        if (zombs.symbol == zombies[2].symbol)
-                        {
                             if (gameTimer % zombs.speed == 0)
                             {
-
                                 landSlot[index].cell_Contents.Remove(zombs);
 
                                 if (nextValueRow == indexRow && nextValue <= landSlot.Count)
                                 {
-                                    landSlot[nextValue].cell_Contents.Add(zombs);
+                                    if (!zombs.specialAction && (nextSlotHasPlant || currentSlotHasPlant))
+                                    {
+                                        landSlot[--nextValue].cell_Contents.Add(zombs);
+                                        zombs.specialAction = true;
+                                        zombs.speed = zombies[0].speed;
+                                    }
+                                    else if (zombs.specialAction || (!nextSlotHasPlant || !currentSlotHasPlant))
+                                    {
+                                        landSlot[nextValue].cell_Contents.Add(zombs);
+                                    }
                                 }
                             }
                         }
@@ -1069,6 +1168,17 @@ namespace PVZ_console
                         }
                     }
                 }
+            }
+        }
+    
+        static void ResetGame()
+        {
+            gameTimer = 0;
+            sunQTY = 0;
+            foreach(Cell cell in landSlot)
+            {
+                cell.cell_Contents.Clear();
+                cell.cell_Contents.Add(" ");
             }
         }
     }
@@ -1117,6 +1227,7 @@ namespace PVZ_console
         public double speed;
         public int hp;
         public double attackSpeed;
+        public bool specialAction = false;
         public ZombieBrain(string name, string desc, string zombSymbol, string zombColor, double zombieSpeed, int health, double atkSpd)
         {
             Zombie_Name = name;
