@@ -125,7 +125,6 @@ namespace PVZ_console
 
 
                 Console.ReadKey(true);
-                Console.Clear();
                 FixedWindow = (Console.WindowHeight != desiredH);
             }
         }
@@ -365,6 +364,48 @@ namespace PVZ_console
             }
         }
 
+        //Draws information about cells in-game
+        static void CellInfo(Cell cellToShow)
+        {
+            Console.SetCursorPosition(Console.WindowLeft + Console.WindowWidth - 50, Console.WindowTop + 5);
+            List<string> cellInfo = new List<string>();
+
+            cellInfo.Add("This cell contains : ");
+
+            foreach(object obj in cellToShow.cell_Contents)
+            {
+                if (landSlot.Contains(cellToShow))
+                {
+                    if (obj is ZombieBrain)
+                    {
+                        ZombieBrain z = (ZombieBrain)obj;
+                        cellInfo.Add($"{z.Zombie_Name}. Remaining HP : {z.hp}");
+                    }
+                    else if (obj is PlantBrain)
+                    {
+                        PlantBrain p = (PlantBrain)obj;
+                        cellInfo.Add($"{p.Plant_Name}. Remaining HP : {p.hp}");
+                    }
+                }
+                if (seedSlot.Contains(cellToShow))
+                {
+                    if (obj is PlantBrain)
+                    {
+                        PlantBrain p = (PlantBrain)obj;
+                        cellInfo.Add($"Seed slot containing {p.Plant_Name}. Sun cost : {p.Sun_cost}.");
+                    }
+                }
+            }
+
+            for (int i = 0; i < cellInfo.Count; i++)
+            {
+                Console.Write("\n");
+                Console.CursorLeft = (Console.WindowLeft + Console.WindowWidth - 50) - (cellInfo[i].Length / 2);
+                Console.Write(cellInfo[i]);
+            }
+
+        }
+
         //Draw pause menu
         static void DPM()
         {
@@ -437,8 +478,6 @@ namespace PVZ_console
                 Console.SetCursorPosition((consoleSize.Item1 / 2), Console.WindowTop + (Console.WindowHeight - 10));
 
                 userChoice = Console.ReadLine();
-
-                Console.Clear();
 
                 if (userChoice.ToUpper() == "Y")
                 {
@@ -655,8 +694,9 @@ namespace PVZ_console
 
             switch (curState)
             {
+                //Check for input WITHOUT blocking script. W/o console.KeyAvailable, the rest of the code would hang :\
+
                 case "In-game":
-                    //Check for input WITHOUT blocking script. W/o console.KeyAvailable, the rest of the code would hang :\
                     if (Console.KeyAvailable && isInWindow)
                     {
                         switch (Console.ReadKey().Key)
@@ -915,6 +955,8 @@ namespace PVZ_console
                     return;
                 }
             }
+
+            CellInfo(cellChecked);
             return;
         }
 
@@ -1069,17 +1111,18 @@ namespace PVZ_console
                         int nextValue = index - 1;
                         string nextValueRow = null;
 
-                        if (nextValue > index)
+
+                        if (nextValue > 0)
+                        {
+                            nextValueRow = rgx.Match(landSlot[nextValue].cell_ID).Value;
+                        }
+
+                        if (nextValueRow != indexRow)
                         {
                             prevState = curState;
                             curState = "Game over";
                             ResetGame();
                             return;
-                        }
-
-                        if (nextValue > 0)
-                        {
-                            nextValueRow = rgx.Match(landSlot[nextValue].cell_ID).Value;
                         }
 
                         if (zombs.hp <= 0)
