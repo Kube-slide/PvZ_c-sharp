@@ -15,7 +15,7 @@ z_GenericZombie  | Moves 1 tile every 2 second and attacks every 2.5 second | z 
 z_PoleVolter | Moves 1 tile every 1.5 second and attacks every 2.5 second | v | Blue | 3 | 5 | 4
 z_Conehead  | Moves 1 tile every 2 second and attacks every 2.5 second | c | DarkRed | 5 | 15 | 4
 z_BucketHead  | Moves 1 tile every 2 second and attacks every 2.5 second | b | DarkCyan | 5 | 20 | 4
-z_Imp | Moves 1 tiles every 2 second and attacks every 1.75 second | i | DarkGray | 2 | 2 | 1
+z_Imp | Moves 1 tiles every 2 second and attacks every 1.75 second | i | DarkGray | .5 | 2 | 1
 
 ---------------===============       Projectiles          ===============---------------
 

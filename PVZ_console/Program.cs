@@ -1111,19 +1111,12 @@ namespace PVZ_console
                         int nextValue = index - 1;
                         string nextValueRow = null;
 
-
                         if (nextValue > 0)
                         {
                             nextValueRow = rgx.Match(landSlot[nextValue].cell_ID).Value;
                         }
 
-                        if (nextValueRow != indexRow)
-                        {
-                            prevState = curState;
-                            curState = "Game over";
-                            ResetGame();
-                            return;
-                        }
+
 
                         if (zombs.hp <= 0)
                         {
@@ -1161,6 +1154,13 @@ namespace PVZ_console
                                 {
                                     landSlot[nextValue].cell_Contents.Add(zombs);
                                 }
+                                else
+                                {
+                                    prevState = curState;
+                                    curState = "Game over";
+                                    ResetGame();
+                                    return;
+                                }
                             }
                         }
 
@@ -1191,6 +1191,13 @@ namespace PVZ_console
                                     {
                                         landSlot[nextValue].cell_Contents.Add(zombs);
                                     }
+                                }
+                                else
+                                {
+                                    prevState = curState;
+                                    curState = "Game over";
+                                    ResetGame();
+                                    return;
                                 }
                             }
                         }
