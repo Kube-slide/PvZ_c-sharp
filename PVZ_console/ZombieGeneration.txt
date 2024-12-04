@@ -10,8 +10,8 @@ yet to implement. idk what special events could happen ngl
 
 -------------------------LEVEL 1------------------------------
 zgen_ | 1 | z_GenericZombie | E | 10 | false | 0
-zgen_ | 1 | z_PoleVolter | C | 5 | false | 0
-zgen_ | 1 | z_GenericZombie | G | 12 | false | 0
-zgen_ | 1 | z_Imp | D | 1 | false | 0
-zgen_ | 1 | z_GenericZombie | C | 20 | false | 0
-zgen_ | 1 | z_GenericZombie | C | 15 | false | 0
+zgen_ | 1 | z_PoleVolter | C | 50 | false | 0
+zgen_ | 1 | z_GenericZombie | G | 40 | false | 0
+zgen_ | 1 | z_Imp | D | 20 | false | 0
+zgen_ | 1 | z_GenericZombie | C | 60 | false | 0
+zgen_ | 1 | z_GenericZombie | C | 80 | false | 0
