@@ -2,10 +2,10 @@
 
 format : {name} \ {description} \ {sun cost} \ {shoot speed} \ {symbol} \ {Color} \ {health}
 
-p_Peashooter | Shoots 1 pea every 3 seconds | 0 | 2 | p | Green | 4
-p_Sunflower | Spawns 1 sun every 5 seconds | 2 | 5 | s | Yellow | 2
+p_Peashooter | Shoots 1 pea every 2 seconds | 3 | 2 | p | Green | 4
+p_Sunflower | Spawns 1 sun every 10 seconds | 2 | 10 | s | Yellow | 2
 p_WallNut | blocks up to 8 zombie attacks | 2 | 0 | w | DarkRed | 8
-p_potatoMine | takes 10 seconds to load, then kills zombies that step on it | 1 | 5 | o | Yellow | 100
+p_potatoMine | takes 8 seconds to load, then kills zombies that step on it | 1 | 8 | o | Yellow | 1
 
 ---------------===============        Zombies          ===============---------------
 
@@ -15,7 +15,7 @@ z_GenericZombie  | Moves 1 tile every 2 second and attacks every 2.5 second | z 
 z_PoleVolter | Moves 1 tile every 1.5 second and attacks every 2.5 second | v | Blue | 3 | 5 | 4
 z_Conehead  | Moves 1 tile every 2 second and attacks every 2.5 second | c | DarkRed | 5 | 15 | 4
 z_BucketHead  | Moves 1 tile every 2 second and attacks every 2.5 second | b | DarkCyan | 5 | 20 | 4
-z_Imp | Moves 1 tiles every 2 second and attacks every 1.75 second | i | DarkGray | .5 | 2 | 1
+z_Imp | Moves 1 tiles every 2 second and attacks every 1.75 second | i | DarkGray | .75 | 2 | 1
 
 ---------------===============       Projectiles          ===============---------------
 

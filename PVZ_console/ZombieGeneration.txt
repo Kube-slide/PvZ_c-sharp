@@ -2,16 +2,39 @@ To add a zombie to generate, start line with the following: zgen_ | ...zombieinf
 
 Formatting levels is as follows : [level#] | [zombie type] | [spawn row] | [spawn time] | [#zombies defeated T/F?] [#Zombies defeated (default to 0 if no need)]
 
-Declare levels by using _lvl#_ //Currently unused
+Declare levels by using _lvl_ , add the level number and amount of zombies in level after (format as follows) e.g : _lvl_ | 1 | 6
 
 
 -----------SPECIAL CODES FOR SOME EVENTS------------
 yet to implement. idk what special events could happen ngl
 
 -------------------------LEVEL 1------------------------------
-zgen_ | 1 | z_GenericZombie | E | 10 | false | 0
-zgen_ | 1 | z_PoleVolter | C | 50 | false | 0
-zgen_ | 1 | z_GenericZombie | G | 40 | false | 0
-zgen_ | 1 | z_Imp | D | 20 | false | 0
-zgen_ | 1 | z_GenericZombie | C | 60 | false | 0
-zgen_ | 1 | z_GenericZombie | C | 80 | false | 0
+_lvl_ | 1 | 6
+zgen_ | 1 | z_GenericZombie | E | 20 | false | 0
+zgen_ | 1 | z_PoleVolter | C | 75 | false | 0
+zgen_ | 1 | z_GenericZombie | G | 65 | false | 0
+zgen_ | 1 | z_Imp | D | 45 | false | 0
+zgen_ | 1 | z_Conehead | C | 50 | false | 0
+zgen_ | 1 | z_BucketHead | C | 80 | false | 0
+
+_lvl_ | 2 | 10
+zgen_ | 2 | z_GenericZombie | C | 20 | false | 0
+zgen_ | 2 | z_GenericZombie | D | 35 | false | 0
+zgen_ | 2 | z_GenericZombie | C | 50 | false | 0
+zgen_ | 2 | z_GenericZombie | D | 65 | false | 0
+zgen_ | 2 | z_GenericZombie | E | 80 | false | 0
+zgen_ | 2 | z_Conehead | F | 95 | false | 0
+zgen_ | 2 | z_PoleVolter | E | 110 | false | 0
+zgen_ | 2 | z_Imp | F | 125 | false | 0
+zgen_ | 2 | z_BucketHead | G | 140 | false | 0
+zgen_ | 2 | z_GenericZombie | G | 155 | false | 0
+zgen_ | 2 | z_Conehead | C | 170 | false | 0
+zgen_ | 2 | z_PoleVolter | D | 185 | false | 0
+zgen_ | 2 | z_Imp | C | 200 | false | 0
+zgen_ | 2 | z_BucketHead | D | 215 | false | 0
+zgen_ | 2 | z_GenericZombie | E | 230 | false | 0
+zgen_ | 2 | z_Conehead | F | 245 | false | 0
+zgen_ | 2 | z_PoleVolter | E | 250 | false | 0
+zgen_ | 2 | z_Imp | F | 250 | false | 0
+zgen_ | 2 | z_BucketHead | G | 250 | false | 0
+zgen_ | 2 | z_GenericZombie | G | 250 | false | 0

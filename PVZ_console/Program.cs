@@ -27,22 +27,26 @@ namespace PVZ_console
         static object mouseQueue = null; //variable to store what the mouse currently is storing (either nothing or a plant to place)
         static List<Cell> cell_list = new List<Cell>(); //list to store every cells' info
         static List<ZombieGenerationInfo> zombGen = new List<ZombieGenerationInfo>(); //Temporary list to store zombie generation
-        static Dictionary<Cell, double> newCellTimers = new Dictionary<Cell, double>();
+        static Dictionary<int, int> levelList = new Dictionary<int, int>();
+        static Dictionary<Cell, decimal> newCellTimers = new Dictionary<Cell, decimal>();
         static int sunQTY = 0; //Player sun qty
 
         //Game state checks
-        static string[] gameStates = { "Menu", "In-game", "Paused", "Instructions", "Credits", "Quit", "Game over", "Almanac"};
+        static string[] gameStates = { "Menu", "In-game", "Paused", "Instructions", "Credits", "Quit", "Game over", "Almanac", "Win"};
         static string curState = gameStates[0];
         static string prevState = null;
         static object lastMovedProj = null;
+        static int zombiesDefeated;
+        static int currentLevel;
 
-        //Conditional checks for loading
+        //Conditional checks
         static bool generatedCells = false;
         static bool preload = false;
         static int selectedOption = 0;
+        static int curLevel = 1;
 
         //In-Game timer for storing game process time
-        static double gameTimer;
+        static decimal gameTimer;
         //==================================================================================================================//
 
         //External stoopid code to import to make some important window related and mouse related functions work
@@ -92,10 +96,10 @@ namespace PVZ_console
                 Draw();
             }
             //Sleep for 1/4 of a second --> 4 fps? doesnt flash eyes too bad
-            Thread.Sleep(250);
+            Thread.Sleep(50);
 
             if (curState == "In-game")
-                gameTimer += 0.25;
+                gameTimer += 0.05m;
             //Clear console (failsafe) and loop :D
             Console.SetCursorPosition(0, 0);
             Console.Clear();
@@ -181,6 +185,11 @@ namespace PVZ_console
                         }
                         zombGen.Add(new ZombieGenerationInfo(Convert.ToInt16(substrings[1]), zombToAdd, substrings[3], Convert.ToDouble(substrings[4]), Convert.ToBoolean(substrings[5]), Convert.ToInt16(substrings[6])));
                     }
+                    if (line.StartsWith("_lvl_"))
+                    {
+                        string[] substrings = line.Split(" | ", StringSplitOptions.RemoveEmptyEntries);
+                        levelList.Add(Convert.ToInt16(substrings[1]),Convert.ToInt16(substrings[2]));
+                    }
                 }
             }
 
@@ -218,6 +227,9 @@ namespace PVZ_console
                     break;
                 case "Almanac":
                     DAM();
+                    break;
+                case "Win":
+                    DWS();
                     break;
                 default:
                     Console.WriteLine("ERROR; PLEASE RESTART THE GAME");
@@ -362,6 +374,25 @@ namespace PVZ_console
                 cellRow++;
                 Console.Write("\n");
             }
+            string lvlProgIndicator = $"Level Progress : ";
+            string lvlRemaining = "";
+            string lvlProgress = "";
+            for (int i = 0; i < levelList[curLevel] - zombiesDefeated; i++)
+            {
+                lvlRemaining += " ";
+            }
+            for(int i = 0; i < zombiesDefeated; i++)
+            {
+                lvlProgress += " ";
+            }
+
+            Console.SetCursorPosition(Console.WindowWidth / 2 - (lvlProgIndicator.Length + lvlRemaining.Length + lvlProgress.Length) / 2, Console.WindowTop + Console.WindowHeight - 2);
+            Console.Write(lvlProgIndicator);
+            Console.BackgroundColor = ConsoleColor.Red;
+            Console.Write(lvlRemaining);
+            Console.BackgroundColor = ConsoleColor.Green;
+            Console.Write(lvlProgress);
+            Console.ResetColor();
         }
 
         //Draws information about cells in-game
@@ -448,7 +479,7 @@ namespace PVZ_console
         {
             (int, int) consoleSize = (Console.WindowWidth, Console.WindowHeight);
 
-            string[] message = { "---GAME OVER---", "The zombies ate your brains...", "", "FINAL SCORE : LEVEL X", "ZOMBIES DEFEATED : X ZOMBIES", "", "Press ENTER to return to main menu and try again", "", "Press ESCAPE to exit to desktop" };
+            string[] message = { "---GAME OVER---", "The zombies ate your brains...", "", $"FINAL SCORE : LEVEL {curLevel}", $"ZOMBIES DEFEATED : {zombiesDefeated} ZOMBIES", "", "Press ENTER to return to main menu and try again", "", "Press ESCAPE to exit to desktop" };
 
             for (int i = 0; i < message.Length; i++)
             {
@@ -537,6 +568,21 @@ namespace PVZ_console
                 Console.Write("\n");
                 Console.CursorLeft = (windowSize.Item1 / 2) - (almanacInfo[i].Length / 2);
                 Console.Write(almanacInfo[i]);
+            }
+        }
+
+        //Draw win screen
+        static void DWS()
+        {
+            (int, int) consoleSize = (Console.WindowWidth, Console.WindowHeight);
+
+            string[] message = { "YOU WIN!", "", $"Zombies defeated : {zombiesDefeated}", "", "Press any key to return to main menu" };
+
+            for (int i = 0; i < message.Length; i++)
+            {
+                Console.Write("\n");
+                Console.CursorLeft = (consoleSize.Item1 / 2) - (message[i].Length / 2);
+                Console.Write(message[i]);
             }
         }
 
@@ -871,6 +917,17 @@ namespace PVZ_console
                     }
                     break;
 
+                case "Win":
+                    if (Console.KeyAvailable)
+                    {
+                        if(Console.ReadKey().Key != null)
+                        {
+                            curState = prevState;
+                            curState = "Menu";
+                        }
+                    }
+                    break;
+
             }
 
             if (!isInWindow)
@@ -966,7 +1023,15 @@ namespace PVZ_console
             //Divide global timer by this amount to dictate when to spawn sun
             Random rnd = new Random();
             int placesun = rnd.Next(0, cell_list.Count());
-            int genSunTime = 8;
+            int genSunTime = 5;
+
+            if(zombiesDefeated == levelList[curLevel])
+            {
+                //prevState = curState;
+                //curState = gameStates.Last();
+                curLevel++;
+                ResetGame();
+            }
 
             //Check if the sun can be generated, and if that cell is a landSlot
             if (gameTimer % genSunTime == 0 && landSlot.Contains(cell_list[placesun]))
@@ -1042,6 +1107,7 @@ namespace PVZ_console
                             List<ZombieBrain> zombiesInCell = cell.cell_Contents.OfType<ZombieBrain>().ToList();
                             cell.cell_Contents.Remove(zombiesInCell[0]);
                             cell.cell_Contents.Remove(cell.cell_Contents.OfType<PlantBrain>().ToList()[0]);
+                            zombiesDefeated++;
                         }
                     }
 
@@ -1121,6 +1187,7 @@ namespace PVZ_console
                         if (zombs.hp <= 0)
                         {
                             cell.cell_Contents.Remove(zombs);
+                            zombiesDefeated++;
                         }
 
                         bool nextSlotHasPlant = landSlot[nextValue].cell_Contents.OfType<PlantBrain>().ToList().Count > 0;
@@ -1137,16 +1204,16 @@ namespace PVZ_console
                         //Regular zombies ; No special stuff going on
                         if (zombs.symbol == zombies[0].symbol || zombs.symbol == zombies[2].symbol || zombs.symbol == zombies[3].symbol || zombs.symbol == zombies[4].symbol)
                         {
-                            if (nextSlotHasPlant && gameTimer % zombs.attackSpeed == 0)
+                            if (nextSlotHasPlant && gameTimer % Convert.ToDecimal(zombs.attackSpeed) == 0)
                             {
                                 --landSlot[nextValue].cell_Contents.OfType<PlantBrain>().ToList()[0].hp;
                             }
-                            if (currentSlotHasPlant && gameTimer % zombs.attackSpeed == 0)
+                            if (currentSlotHasPlant && gameTimer % Convert.ToDecimal(zombs.attackSpeed) == 0)
                             {
                                 --landSlot[index].cell_Contents.OfType<PlantBrain>().ToList()[0].hp;
                             }
 
-                            if (gameTimer % zombs.speed == 0 && !nextSlotHasPlant && !currentSlotHasPlant)
+                            if (gameTimer % Convert.ToDecimal(zombs.speed) == 0 && !nextSlotHasPlant && !currentSlotHasPlant)
                             {
                                 landSlot[index].cell_Contents.Remove(zombs);
 
@@ -1166,16 +1233,16 @@ namespace PVZ_console
 
                         if (zombs.symbol == zombies[1].symbol)
                         {
-                            if ((nextSlotHasPlant) && gameTimer % zombs.attackSpeed == 0)
+                            if ((nextSlotHasPlant) && gameTimer % Convert.ToDecimal(zombs.attackSpeed) == 0)
                             {
                                     --landSlot[nextValue].cell_Contents.OfType<PlantBrain>().ToList()[0].hp;
                             }
-                            if ((currentSlotHasPlant) && gameTimer % zombs.attackSpeed == 0)
+                            if ((currentSlotHasPlant) && gameTimer % Convert.ToDecimal(zombs.attackSpeed) == 0)
                             {
                                 --landSlot[index].cell_Contents.OfType<PlantBrain>().ToList()[0].hp;
                             }
 
-                            if (gameTimer % zombs.speed == 0)
+                            if (gameTimer % Convert.ToDecimal(zombs.speed) == 0)
                             {
                                 landSlot[index].cell_Contents.Remove(zombs);
 
@@ -1207,7 +1274,7 @@ namespace PVZ_console
 
             foreach (ZombieGenerationInfo enemyGen in zombGen)
             {
-                if (gameTimer == enemyGen.spawnTime)
+                if (gameTimer == Convert.ToDecimal(enemyGen.spawnTime) && enemyGen.level == curLevel)
                 {
                     foreach (Cell cell in landSlot)
                     {
@@ -1225,6 +1292,7 @@ namespace PVZ_console
         {
             gameTimer = 0;
             sunQTY = 0;
+            zombiesDefeated = 0;
             foreach(Cell cell in landSlot)
             {
                 cell.cell_Contents.Clear();
