@@ -3,9 +3,9 @@
 format : {name} \ {description} \ {sun cost} \ {shoot speed} \ {symbol} \ {Color} \ {health}
 
 p_Peashooter | Shoots 1 pea every 2 seconds | 3 | 2 | p | Green | 4
-p_Sunflower | Spawns 1 sun every 10 seconds | 2 | 10 | s | Yellow | 2
+p_Sunflower | Spawns 1 sun every 10 seconds | 2 | 10 | s | Yellow | 4
 p_WallNut | blocks up to 8 zombie attacks | 2 | 0 | w | DarkRed | 8
-p_potatoMine | takes 8 seconds to load, then kills zombies that step on it | 1 | 8 | o | Yellow | 1
+p_potatoMine | takes 8 seconds to load, then kills zombies that step on it | 2 | 8 | o | Yellow | 2
 
 ---------------===============        Zombies          ===============---------------
 

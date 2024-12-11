@@ -9,14 +9,13 @@ Declare levels by using _lvl_ , add the level number and amount of zombies in le
 yet to implement. idk what special events could happen ngl
 
 -------------------------LEVEL 1------------------------------
-_lvl_ | 1 | 6
+_lvl_ | 1 | 5
 zgen_ | 1 | z_GenericZombie | E | 20 | false | 0
+zgen_ | 1 | z_GenericZombie | C | 50 | false | 0
+zgen_ | 1 | z_Conehead | G | 65 | false | 0
 zgen_ | 1 | z_PoleVolter | C | 75 | false | 0
-zgen_ | 1 | z_GenericZombie | G | 65 | false | 0
-zgen_ | 1 | z_Imp | D | 45 | false | 0
-zgen_ | 1 | z_Conehead | C | 50 | false | 0
 zgen_ | 1 | z_BucketHead | C | 80 | false | 0
-
+-------------------------LEVEL 2------------------------------
 _lvl_ | 2 | 10
 zgen_ | 2 | z_GenericZombie | C | 20 | false | 0
 zgen_ | 2 | z_GenericZombie | D | 35 | false | 0
@@ -38,3 +37,36 @@ zgen_ | 2 | z_PoleVolter | E | 250 | false | 0
 zgen_ | 2 | z_Imp | F | 250 | false | 0
 zgen_ | 2 | z_BucketHead | G | 250 | false | 0
 zgen_ | 2 | z_GenericZombie | G | 250 | false | 0
+-------------------------LEVEL 3------------------------------
+_lvl_ | 3 | 30
+zgen_ | 3 | z_GenericZombie | C | 30 | false | 0
+zgen_ | 3 | z_GenericZombie | D | 45 | false | 0
+zgen_ | 3 | z_GenericZombie | E | 60 | false | 0
+zgen_ | 3 | z_Conehead | C | 75 | false | 0
+zgen_ | 3 | z_PoleVolter | D | 90 | false | 0
+zgen_ | 3 | z_Imp | E | 105 | false | 0
+zgen_ | 3 | z_BucketHead | C | 120 | false | 0
+zgen_ | 3 | z_GenericZombie | D | 135 | false | 0
+zgen_ | 3 | z_Conehead | E | 150 | false | 0
+zgen_ | 3 | z_PoleVolter | C | 165 | false | 0
+zgen_ | 3 | z_Imp | D | 180 | false | 0
+zgen_ | 3 | z_BucketHead | E | 195 | false | 0
+zgen_ | 3 | z_GenericZombie | C | 210 | false | 0
+zgen_ | 3 | z_Conehead | D | 225 | false | 0
+zgen_ | 3 | z_PoleVolter | E | 240 | false | 0
+zgen_ | 3 | z_Imp | C | 255 | false | 0
+zgen_ | 3 | z_Imp | D | 255 | false | 0
+zgen_ | 3 | z_Imp | E | 255 | false | 0
+zgen_ | 3 | z_Imp | F | 255 | false | 0
+zgen_ | 3 | z_Imp | G | 255 | false | 0
+zgen_ | 3 | z_BucketHead | E | 270 | false | 0
+zgen_ | 3 | z_GenericZombie | C | 280 | false | 0
+zgen_ | 3 | z_Conehead | D | 280 | false | 0
+zgen_ | 3 | z_PoleVolter | E | 282 | false | 0
+zgen_ | 3 | z_Imp | C | 285 | false | 0
+zgen_ | 3 | z_BucketHead | D | 290 | false | 0
+zgen_ | 3 | z_GenericZombie | E | 292 | false | 0
+zgen_ | 3 | z_Conehead | C | 295 | false | 0
+zgen_ | 3 | z_PoleVolter | D | 298 | false | 0
+zgen_ | 3 | z_Imp | E | 300 | false | 0
+zgen_ | 3 | z_BucketHead | C | 300 | false | 0
